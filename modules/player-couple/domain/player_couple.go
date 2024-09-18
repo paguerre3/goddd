@@ -13,7 +13,7 @@ type PlayerCouple struct {
 	Ranking int    `json:"ranking"`
 }
 
-func NewPlayer(id string, name string, age int) *Player {
+func NewValidPlayer(id string, name string, age int) *Player {
 	return &Player{
 		ID:   id,
 		Name: name,
@@ -21,7 +21,7 @@ func NewPlayer(id string, name string, age int) *Player {
 	}
 }
 
-func NewPlayerCouple(id string, player1 Player, player2 Player, ranking int) *PlayerCouple {
+func NewValidPlayerCouple(id string, player1 Player, player2 Player, ranking int) *PlayerCouple {
 	return &PlayerCouple{
 		ID:      id,
 		Player1: player1,

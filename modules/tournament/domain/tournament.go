@@ -1,10 +1,5 @@
 package domain
 
-/*
-import (
-	"github.com/paguerre3/goddd/modules/player-couple/domain"
-)
-
 type Tournament struct {
 	ID            string           `json:"id"`
 	Title         string           `json:"title"`
@@ -30,4 +25,3 @@ type Score struct {
 	Set2 int `json:"set2"`
 	Set3 int `json:"set3"`
 }
-*/
