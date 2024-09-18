@@ -1,0 +1,2 @@
+# goddd
+DDD Onion project
