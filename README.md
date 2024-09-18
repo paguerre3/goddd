@@ -5,6 +5,7 @@ DDD Onion project
 ---
 ### Project structure
 
+```plaintext
 padel-tournament/
 │
 ├── cmd/
@@ -44,3 +45,5 @@ padel-tournament/
 ├── docker-compose.yml                       # Docker Compose configuration
 ├── Dockerfile                               # Dockerfile for Go app
 └── go.mod                                   # Go modules
+```
+
