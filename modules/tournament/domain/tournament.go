@@ -21,7 +21,7 @@ type Match struct {
 }
 
 type Score struct {
-	Set1 int `json:"set1"`
-	Set2 int `json:"set2"`
-	Set3 int `json:"set3"`
+	Set1 int  `json:"set1"`
+	Set2 int  `json:"set2"`
+	Set3 *int `json:"set3,omitempty"`
 }
