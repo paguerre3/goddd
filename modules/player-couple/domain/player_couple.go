@@ -1,6 +1,8 @@
 package domain
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Player struct {
 	ID                   string  `json:"id"`
@@ -13,10 +15,14 @@ type PlayerCouple struct {
 	ID      string `json:"id"`
 	Player1 Player `json:"player1"`
 	Player2 Player `json:"player2"`
-	Ranking int    `json:"ranking"`
+	Ranking *int   `json:"ranking,omitempty"`
 }
 
-func NewPlayer(socialSecurityNumber *string, name string, age *int) (*Player, error) {
+func NewPlayer(idGen IDGenerator, socialSecurityNumber *string,
+	name string, age *int) (*Player, error) {
+	if idGen == nil {
+		return nil, fmt.Errorf("idGen cannot be nil")
+	}
 	if socialSecurityNumber != nil && len(*socialSecurityNumber) < 8 {
 		return nil, fmt.Errorf("invalid social security number: %s", *socialSecurityNumber)
 	}
@@ -27,17 +33,27 @@ func NewPlayer(socialSecurityNumber *string, name string, age *int) (*Player, er
 		return nil, fmt.Errorf("invalid age: %d", *age)
 	}
 	return &Player{
-		ID:   "", // TODO: generate ID
-		Name: name,
-		Age:  age,
+		ID:                   idGen.GenerateID(),
+		SocialSecurityNumber: socialSecurityNumber,
+		Name:                 name,
+		Age:                  age,
 	}, nil
 }
 
-func NewPlayerCouple(id string, player1 Player, player2 Player, ranking int) *PlayerCouple {
+func NewPlayerCouple(idGen IDGenerator, player1 Player, player2 Player, ranking *int) (*PlayerCouple, error) {
+	if idGen == nil {
+		return nil, fmt.Errorf("idGen cannot be nil")
+	}
+	if player1.ID == player2.ID {
+		return nil, fmt.Errorf("player1 and player2 cannot be the same")
+	}
+	if ranking != nil && (*ranking < 1 || *ranking > 8) {
+		return nil, fmt.Errorf("invalid ranking: %d", *ranking)
+	}
 	return &PlayerCouple{
-		ID:      id,
+		ID:      idGen.GenerateIDWithPrefixes(player1.Name, player2.Name),
 		Player1: player1,
 		Player2: player2,
 		Ranking: ranking,
-	}
+	}, nil
 }
