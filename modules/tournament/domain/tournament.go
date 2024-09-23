@@ -31,12 +31,12 @@ type Match struct {
 }
 
 type Score struct {
-	Set1 GamesTuple  `json:"set1"`
-	Set2 GamesTuple  `json:"set2"`
-	Set3 *GamesTuple `json:"set3,omitempty"`
+	Set1 Games  `json:"set1"`
+	Set2 Games  `json:"set2"`
+	Set3 *Games `json:"set3,omitempty"`
 }
 
-type GamesTuple struct {
+type Games struct {
 	GamesCouple1 int       `json:"gamesCouple1"`
 	GamesCouple2 int       `json:"gamesCouple2"`
 	Tiebreak     *Tiebreak `json:"tiebreak,omitempty"`
@@ -47,7 +47,7 @@ type Tiebreak struct {
 	PointsCouple2 int `json:"pointsCouple2"`
 }
 
-func NewScore(set1, set2, set3 *GamesTuple) (*Score, error) {
+func NewScore(set1, set2, set3 *Games) (*Score, error) {
 	if set1 == nil {
 		return nil, fmt.Errorf("set1 cannot be nil")
 	}
@@ -57,14 +57,14 @@ func NewScore(set1, set2, set3 *GamesTuple) (*Score, error) {
 	return &Score{Set1: *set1, Set2: *set2, Set3: set3}, nil
 }
 
-func NewGamesTuple(gamesCouple1, gamesCouple2 int, tiebreak *Tiebreak) (*GamesTuple, error) {
+func NewGamesTuple(gamesCouple1, gamesCouple2 int, tiebreak *Tiebreak) (*Games, error) {
 	if gamesCouple1 < minGames || gamesCouple1 > maxGames {
 		return nil, fmt.Errorf("invalid gamesCouple1: %d", gamesCouple1)
 	}
 	if gamesCouple2 < minGames || gamesCouple2 > maxGames {
 		return nil, fmt.Errorf("invalid gamesCouple2: %d", gamesCouple2)
 	}
-	return &GamesTuple{
+	return &Games{
 		GamesCouple1: gamesCouple1,
 		GamesCouple2: gamesCouple2,
 		Tiebreak:     tiebreak,
