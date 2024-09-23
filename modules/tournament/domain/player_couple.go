@@ -2,10 +2,13 @@ package domain
 
 // Adapted copy similar to player_couple module.
 // (not imported as its a different module so it must be a copy for tournaments).
+// Used to retrieve registered players domain objects from tournament (repository).
 type Player struct {
 	ID                   string  `json:"id"`
+	Email                string  `json:"email"`
 	SocialSecurityNumber *string `json:"ssn,omitempty"`
-	Name                 string  `json:"name"`
+	FirstName            string  `json:"name"`
+	LastName             string  `json:"surname"`
 	Age                  *int    `json:"age,omitempty"`
 }
 

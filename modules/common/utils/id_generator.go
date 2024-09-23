@@ -15,9 +15,9 @@ func NewUUIDGenerator() *UUIDGenerator {
 }
 
 func (g *UUIDGenerator) GenerateID() string {
-	return uuid.New().String()
+	return uuid.NewString()
 }
 
 func (g *UUIDGenerator) GenerateIDWithPrefixes(prefix1 string, prefix2 string) string {
-	return fmt.Sprintf("%s&%s-%s", prefix1, prefix2, g.GenerateID())
+	return fmt.Sprintf("%s-%s-%s", prefix1, prefix2, g.GenerateID())
 }

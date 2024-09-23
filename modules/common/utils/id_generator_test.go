@@ -19,7 +19,7 @@ func TestGenerateIDWithPrefixes_ValidFormat(t *testing.T) {
 	prefix1 := "prefix1"
 	prefix2 := "prefix2"
 	id := NewUUIDGenerator().GenerateIDWithPrefixes(prefix1, prefix2)
-	match, _ := regexp.MatchString(`^prefix1&prefix2-[a-f0-9\-]{36}$`, id)
+	match, _ := regexp.MatchString(`^prefix1-prefix2-[a-f0-9\-]{36}$`, id)
 	assert.True(t, match, "GenerateIDWithPrefixes should return a valid double-prefixed UUID")
 }
 
