@@ -4,6 +4,13 @@ import (
 	"fmt"
 )
 
+const (
+	minRank      = 1
+	maxRank      = 8
+	minSSNDigits = 8
+	maxAge       = 100
+)
+
 type Player struct {
 	ID                   string  `json:"id"`
 	SocialSecurityNumber *string `json:"ssn,omitempty"`
@@ -23,13 +30,13 @@ func NewPlayer(idGen IDGenerator, socialSecurityNumber *string,
 	if idGen == nil {
 		return nil, fmt.Errorf("idGen cannot be nil")
 	}
-	if socialSecurityNumber != nil && len(*socialSecurityNumber) < 8 {
+	if socialSecurityNumber != nil && len(*socialSecurityNumber) < minSSNDigits {
 		return nil, fmt.Errorf("invalid social security number: %s", *socialSecurityNumber)
 	}
 	if len(name) < 2 {
 		return nil, fmt.Errorf("invalid name: %s", name)
 	}
-	if age != nil && (*age < 3 || *age > 100) {
+	if age != nil && (*age < 3 || *age > maxAge) {
 		return nil, fmt.Errorf("invalid age: %d", *age)
 	}
 	return &Player{
@@ -47,7 +54,7 @@ func NewPlayerCouple(idGen IDGenerator, player1 Player, player2 Player, ranking 
 	if player1.ID == player2.ID {
 		return nil, fmt.Errorf("player1 and player2 cannot be the same")
 	}
-	if ranking != nil && (*ranking < 1 || *ranking > 8) {
+	if ranking != nil && (*ranking < minRank || *ranking > maxRank) {
 		return nil, fmt.Errorf("invalid ranking: %d", *ranking)
 	}
 	return &PlayerCouple{
