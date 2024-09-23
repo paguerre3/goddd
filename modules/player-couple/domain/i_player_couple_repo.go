@@ -1,6 +1,6 @@
 package domain
 
-// interface to be used by infrastructure layer:
+// interfaces to be used by infrastructure layer:
 type PlayerRepository interface {
 	Save(player Player) error
 	FindByID(id string) (Player, error)
