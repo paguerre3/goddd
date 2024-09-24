@@ -17,9 +17,9 @@ const (
 type Player struct {
 	ID                   string  `json:"id"`
 	Email                string  `json:"email"`
-	SocialSecurityNumber *string `json:"ssn,omitempty"`
-	FirstName            string  `json:"name"`
-	LastName             string  `json:"surname"`
+	SocialSecurityNumber *string `json:"socialSecurityNumber,omitempty"`
+	FirstName            string  `json:"firstName"`
+	LastName             string  `json:"lastName"`
 	Age                  *int    `json:"age,omitempty"`
 }
 

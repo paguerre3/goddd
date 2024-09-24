@@ -44,7 +44,7 @@ func TestMatch_MarshalJSON_Success(t *testing.T) {
 	jsonData, err := json.Marshal(match)
 	assert.NoError(t, err, "Expected no error during JSON marshalling")
 	// couple 1 and 2 are required so they can't be nil, instead they will always be empty if not created properly:
-	assert.JSONEq(t, `{"id":"m1","timestamp":"2024-09-18T12:00","couple1":{"id":"","player1":{"id":"","email":"","name":"","surname":""},"player2":{"id":"","email":"","name":"","surname":""}},"couple2":{"id":"","player1":{"id":"","email":"","name":"","surname":""},"player2":{"id":"","email":"","name":"","surname":""}}}`,
+	assert.JSONEq(t, `{"id":"m1","timestamp":"2024-09-18T12:00","couple1":{"id":"","player1":{"id":"","email":"","firstName":"","lastName":""},"player2":{"id":"","email":"","firstName":"","lastName":""}},"couple2":{"id":"","player1":{"id":"","email":"","firstName":"","lastName":""},"player2":{"id":"","email":"","firstName":"","lastName":""}}}`,
 		string(jsonData), "Expected JSON to match")
 }
 

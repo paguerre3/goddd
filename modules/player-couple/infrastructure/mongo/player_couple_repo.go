@@ -1,4 +1,4 @@
-package infrastructure
+package mongo
 
 import (
 	"context"
@@ -57,12 +57,11 @@ func (r *mongoPlayerRepository) FindByLastName(lastName string) ([]domain.Player
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	cursor, err := r.collection.Find(ctx, bson.M{"last_name": lastName})
+	cursor, err := r.collection.Find(ctx, bson.M{"lastName": lastName})
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
-
 	var players []domain.Player
 	for cursor.Next(ctx) {
 		var player domain.Player
