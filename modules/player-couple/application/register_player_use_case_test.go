@@ -111,6 +111,31 @@ func TestRegisterPlayerUseCase_UpdateExistingPlayerByID(t *testing.T) {
 	assert.Equal(t, RegisterPlayerUpdated, status)
 }
 
+func TestRegisterPlayerUseCase_UpdateExistingPlayerByIDValidationError(t *testing.T) {
+	// Arrange
+	idGen := &MockIDGenerator{}
+	repo := &MockPlayerRepository{}
+	service := NewRegisterPlayerUseCase(repo, idGen)
+	inputPlayer := domain.Player{
+		// Invalid ID
+		ID:        "i",
+		FirstName: "John",
+		LastName:  "Doe",
+		Email:     "test@example.com",
+	}
+
+	// Expect
+	expectedErr := domain.ValidateID(inputPlayer.ID)
+
+	// Act
+	status, err := service.RegisterPlayerUseCase(inputPlayer)
+
+	// Assert
+	assert.Error(t, err)
+	assert.Equal(t, expectedErr, err)
+	assert.Equal(t, RegisterPlayerPending, status)
+}
+
 func TestRegisterPlayerUseCase_UpdateExistingPlayerByEmail(t *testing.T) {
 	// Arrange
 	idGen := &MockIDGenerator{}
