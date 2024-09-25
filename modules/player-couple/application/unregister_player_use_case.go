@@ -16,13 +16,13 @@ const (
 
 func NewUnregisterPlayerUseCase(playerRepository domain.PlayerRepository,
 	idGenerator domain.IDGenerator) UnregisterPlayerUseCase {
-	return &playerCoupleService{
+	return &playerService{
 		playerRepo: playerRepository,
 		idGen:      idGenerator,
 	}
 }
 
-func (s *playerCoupleService) UnregisterPlayerUseCase(playerId string) (status UnregisterPlayerStatus, err error) {
+func (s *playerService) UnregisterPlayerUseCase(playerId string) (status UnregisterPlayerStatus, err error) {
 	foundPlayer, err := s.playerRepo.FindByID(playerId)
 	if err != nil {
 		return status, err

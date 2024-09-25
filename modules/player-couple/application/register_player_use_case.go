@@ -18,14 +18,14 @@ const (
 
 func NewRegisterPlayerUseCase(playerRepository domain.PlayerRepository,
 	idGenerator domain.IDGenerator) RegisterPlayerUseCase {
-	return &playerCoupleService{
+	return &playerService{
 		playerRepo: playerRepository,
 		idGen:      idGenerator,
 	}
 }
 
 // RegisterPlayerUseCase registers a player or updates it if it already exists.
-func (s *playerCoupleService) RegisterPlayerUseCase(inputPlayer domain.Player) (status RegisterPlayerStatus, err error) {
+func (s *playerService) RegisterPlayerUseCase(inputPlayer domain.Player) (status RegisterPlayerStatus, err error) {
 	// Validate new player entries.
 	newPlayer, err := domain.NewPlayer(s.idGen,
 		inputPlayer.Email,
