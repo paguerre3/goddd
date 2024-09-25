@@ -4,20 +4,28 @@ import (
 	"github.com/paguerre3/goddd/modules/player-couple/domain"
 )
 
+type RegisterPlayerUseCase interface {
+	RegisterPlayerUseCase(inputPlayer domain.Player) (status RegisterPlayerStatus, err error)
+}
+
 type RegisterPlayerStatus uint8
-type UnregisterPlayerStatus uint8
 
 const (
 	RegisterPlayerPending RegisterPlayerStatus = iota
 	RegisterPlayerUpdated
 	RegisterPlayerCreated
-	UnregisterPlayerPending UnregisterPlayerStatus = iota
-	UnregisterPlayerNotFound
-	UnregisterPlayerDeleted
 )
 
+func NewRegisterPlayerUseCase(playerRepository domain.PlayerRepository,
+	idGenerator domain.IDGenerator) RegisterPlayerUseCase {
+	return &playerCoupleService{
+		playerRepo: playerRepository,
+		idGen:      idGenerator,
+	}
+}
+
 // RegisterPlayerUseCase registers a player or updates it if it already exists.
-func (s *PlayerCoupleService) RegisterPlayerUseCase(inputPlayer domain.Player) (status RegisterPlayerStatus, err error) {
+func (s *playerCoupleService) RegisterPlayerUseCase(inputPlayer domain.Player) (status RegisterPlayerStatus, err error) {
 	// Validate new player entries.
 	newPlayer, err := domain.NewPlayer(s.idGen,
 		inputPlayer.Email,
@@ -60,20 +68,4 @@ func (s *PlayerCoupleService) RegisterPlayerUseCase(inputPlayer domain.Player) (
 	}
 
 	return status, err
-}
-
-func (s *PlayerCoupleService) UnregisterPlayerUseCase(playerId string) (status UnregisterPlayerStatus, err error) {
-	foundPlayer, err := s.playerRepo.FindByID(playerId)
-	if err != nil {
-		return status, err
-	}
-	if len(foundPlayer.ID) == 0 {
-		status = UnregisterPlayerNotFound
-		return status, nil
-	}
-	if err = s.playerRepo.Delete(playerId); err != nil {
-		return status, err
-	}
-	status = UnregisterPlayerDeleted
-	return status, nil
 }
