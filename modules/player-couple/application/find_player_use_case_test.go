@@ -166,6 +166,23 @@ func TestFindPlayersByLastNameUseCase(t *testing.T) {
 		assert.Equal(t, expectedPlayers, players)
 	})
 
+	t.Run("Valid last name players not found", func(t *testing.T) {
+		// Arrange
+		repo := &MockPlayerRepository{}
+		service := NewFindPlayerUseCase(repo, &MockIDGenerator{})
+		lastName := "Doe"
+		var expectedPlayers []domain.Player = nil
+
+		repo.On("FindByLastName", lastName).Return(expectedPlayers, nil)
+
+		// Act
+		players, err := service.FindPlayersByLastNameUseCase(lastName)
+
+		// Assert
+		assert.NoError(t, err)
+		assert.Equal(t, expectedPlayers, players)
+	})
+
 	t.Run("Invalid last name players not browsed", func(t *testing.T) {
 		// Arrange
 		repo := &MockPlayerRepository{}
