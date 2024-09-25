@@ -12,6 +12,7 @@ const (
 	minAge        = 3
 	maxAge        = 100
 	minNameDigits = 3
+	minIdDigits   = 3
 )
 
 type Player struct {
@@ -35,8 +36,8 @@ func NewPlayer(idGen IDGenerator, email string, socialSecurityNumber *string,
 	if idGen == nil {
 		return nil, fmt.Errorf("idGen cannot be nil")
 	}
-	if _, err := mail.ParseAddress(email); err != nil {
-		return nil, fmt.Errorf("invalid email: %s", email)
+	if err := ValidateEmail(email); err != nil {
+		return nil, err
 	}
 	if socialSecurityNumber != nil && len(*socialSecurityNumber) < minSSNDigits {
 		return nil, fmt.Errorf("invalid social security number: %s", *socialSecurityNumber)
@@ -44,8 +45,8 @@ func NewPlayer(idGen IDGenerator, email string, socialSecurityNumber *string,
 	if len(firstName) < minNameDigits {
 		return nil, fmt.Errorf("invalid first name: %s", firstName)
 	}
-	if len(lastName) < minNameDigits {
-		return nil, fmt.Errorf("invalid last name: %s", lastName)
+	if err := ValidateLastName(lastName); err != nil {
+		return nil, err
 	}
 	if age != nil && (*age < minAge || *age > maxAge) {
 		return nil, fmt.Errorf("invalid age: %d", *age)
@@ -58,6 +59,27 @@ func NewPlayer(idGen IDGenerator, email string, socialSecurityNumber *string,
 		LastName:             lastName,
 		Age:                  age,
 	}, nil
+}
+
+func ValidateID(id string) error {
+	if len(id) < minIdDigits {
+		return fmt.Errorf("invalid id: %s", id)
+	}
+	return nil
+}
+
+func ValidateEmail(email string) error {
+	if _, err := mail.ParseAddress(email); err != nil {
+		return fmt.Errorf("invalid email: %s", email)
+	}
+	return nil
+}
+
+func ValidateLastName(lastName string) error {
+	if len(lastName) < minNameDigits {
+		return fmt.Errorf("invalid last name: %s", lastName)
+	}
+	return nil
 }
 
 func NewPlayerCouple(idGen IDGenerator, player1 Player, player2 Player, ranking *int) (*PlayerCouple, error) {

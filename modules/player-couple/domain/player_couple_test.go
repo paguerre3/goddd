@@ -28,6 +28,24 @@ func (m *MockIDGenerator) GenerateIDWithPrefixes(p1, p2 string) string {
 	return fmt.Sprintf("%s-%s-%s", p1, p2, mockId)
 }
 
+func TestValidateID(t *testing.T) {
+	// Test case: ID is shorter than minIdDigits
+	id := "12"
+	err := ValidateID(id)
+	assert.Error(t, err, "Expected error for ID shorter than minIdDigits")
+	assert.EqualError(t, err, "invalid id: 12", "Expected error message for ID shorter than minIdDigits")
+
+	// Test case: ID is equal to minIdDigits
+	id = "123"
+	err = ValidateID(id)
+	assert.NoError(t, err, "Expected no error for ID equal to minIdDigits")
+
+	// Test case: ID is longer than minIdDigits
+	id = "123456789012345678901234567890"
+	err = ValidateID(id)
+	assert.NoError(t, err, "Expected no error for ID longer than minIdDigits")
+}
+
 // TestNewPlayer_Success tests successful creation of a Player
 func TestNewPlayer_Success(t *testing.T) {
 	idGen := &MockIDGenerator{}
