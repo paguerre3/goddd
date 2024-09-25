@@ -32,9 +32,8 @@ func TestUnregisterPlayerUseCase(t *testing.T) {
 		idGen := &MockIDGenerator{}
 		repo := &MockPlayerRepository{}
 		service := NewUnregisterPlayerUseCase(repo, idGen)
-		playerId := "invalid-id"
-		expectedErr := errors.New("invalid ID")
-		repo.On("FindByID", playerId).Return(domain.Player{}, expectedErr)
+		playerId := "i"
+		expectedErr := domain.ValidateID(playerId)
 
 		// Act
 		status, err := service.UnregisterPlayerUseCase(playerId)
@@ -42,7 +41,7 @@ func TestUnregisterPlayerUseCase(t *testing.T) {
 		// Assert
 		assert.Error(t, err)
 		assert.Equal(t, expectedErr, err)
-		assert.Equal(t, UnregisterPlayerPending, status)
+		assert.Equal(t, UnregisterPlayerInvalid, status)
 	})
 
 	t.Run("Player not found", func(t *testing.T) {

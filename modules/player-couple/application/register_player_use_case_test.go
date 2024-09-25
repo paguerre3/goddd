@@ -78,13 +78,20 @@ func TestRegisterPlayerUseCase_Success(t *testing.T) {
 	// Expect
 	repo.On("FindByEmail", inputPlayer.Email).Return(domain.Player{}, nil)
 	repo.On("Save", mock.Anything).Return(nil)
+	expectedNewPlayer := domain.Player{
+		ID:        idGen.GenerateID(),
+		FirstName: "John",
+		LastName:  "Doe",
+		Email:     "test@example.com",
+	}
 
 	// Act
-	status, err := service.RegisterPlayerUseCase(inputPlayer)
+	newPlayer, status, err := service.RegisterPlayerUseCase(inputPlayer)
 
 	// Assert
 	assert.NoError(t, err)
 	assert.Equal(t, RegisterPlayerCreated, status)
+	assert.Equal(t, expectedNewPlayer, newPlayer)
 }
 
 func TestRegisterPlayerUseCase_UpdateExistingPlayerByID(t *testing.T) {
@@ -102,13 +109,15 @@ func TestRegisterPlayerUseCase_UpdateExistingPlayerByID(t *testing.T) {
 	// Expect
 	repo.On("FindByID", inputPlayer.ID).Return(domain.Player{ID: inputPlayer.ID}, nil)
 	repo.On("Update", mock.Anything).Return(nil)
+	expectedNewPlayer := inputPlayer
 
 	// Act
-	status, err := service.RegisterPlayerUseCase(inputPlayer)
+	newPlayer, status, err := service.RegisterPlayerUseCase(inputPlayer)
 
 	// Assert
 	assert.NoError(t, err)
 	assert.Equal(t, RegisterPlayerUpdated, status)
+	assert.Equal(t, expectedNewPlayer, newPlayer)
 }
 
 func TestRegisterPlayerUseCase_UpdateExistingPlayerByIDValidationError(t *testing.T) {
@@ -126,14 +135,16 @@ func TestRegisterPlayerUseCase_UpdateExistingPlayerByIDValidationError(t *testin
 
 	// Expect
 	expectedErr := domain.ValidateID(inputPlayer.ID)
+	var expectedNewPlayer domain.Player
 
 	// Act
-	status, err := service.RegisterPlayerUseCase(inputPlayer)
+	newPlayer, status, err := service.RegisterPlayerUseCase(inputPlayer)
 
 	// Assert
 	assert.Error(t, err)
 	assert.Equal(t, expectedErr, err)
-	assert.Equal(t, RegisterPlayerPending, status)
+	assert.Equal(t, RegisterPlayerInvalid, status)
+	assert.Equal(t, expectedNewPlayer, newPlayer)
 }
 
 func TestRegisterPlayerUseCase_UpdateExistingPlayerByEmail(t *testing.T) {
@@ -150,13 +161,20 @@ func TestRegisterPlayerUseCase_UpdateExistingPlayerByEmail(t *testing.T) {
 	// Expect
 	repo.On("FindByEmail", inputPlayer.Email).Return(domain.Player{ID: "existing-id"}, nil)
 	repo.On("Update", mock.Anything).Return(nil)
+	expectedNewPlayer := domain.Player{
+		ID:        "existing-id",
+		FirstName: "John",
+		LastName:  "Doe",
+		Email:     "test@example.com",
+	}
 
 	// Act
-	status, err := service.RegisterPlayerUseCase(inputPlayer)
+	newPlayer, status, err := service.RegisterPlayerUseCase(inputPlayer)
 
 	// Assert
 	assert.NoError(t, err)
 	assert.Equal(t, RegisterPlayerUpdated, status)
+	assert.Equal(t, expectedNewPlayer, newPlayer)
 }
 
 func TestRegisterPlayerUseCase_ValidationError(t *testing.T) {
@@ -169,14 +187,16 @@ func TestRegisterPlayerUseCase_ValidationError(t *testing.T) {
 	// Expect
 	_, expectedErr := domain.NewPlayer(idGen, inputPlayer.Email, nil, "", "", nil)
 	assert.Error(t, expectedErr)
+	var expectedNewPlayer domain.Player
 
 	// Act
-	status, err := service.RegisterPlayerUseCase(inputPlayer)
+	newPlayer, status, err := service.RegisterPlayerUseCase(inputPlayer)
 
 	// Assert
 	assert.Error(t, err)
 	assert.Equal(t, expectedErr, err)
-	assert.Equal(t, RegisterPlayerPending, status)
+	assert.Equal(t, RegisterPlayerInvalid, status)
+	assert.Equal(t, expectedNewPlayer, newPlayer)
 }
 
 func TestRegisterPlayerUseCase_FindByIDError(t *testing.T) {
@@ -194,14 +214,16 @@ func TestRegisterPlayerUseCase_FindByIDError(t *testing.T) {
 	// Expect
 	expectedErr := assert.AnError
 	repo.On("FindByID", inputPlayer.ID).Return(domain.Player{}, expectedErr)
+	var expectedNewPlayer domain.Player
 
 	// Act
-	status, err := service.RegisterPlayerUseCase(inputPlayer)
+	newPlayer, status, err := service.RegisterPlayerUseCase(inputPlayer)
 
 	// Assert
 	assert.Error(t, err)
 	assert.Equal(t, expectedErr, err)
 	assert.Equal(t, RegisterPlayerPending, status)
+	assert.Equal(t, expectedNewPlayer, newPlayer)
 }
 
 func TestRegisterPlayerUseCase_FindByEmailError(t *testing.T) {
@@ -218,14 +240,16 @@ func TestRegisterPlayerUseCase_FindByEmailError(t *testing.T) {
 	// Expect
 	expectedErr := assert.AnError
 	repo.On("FindByEmail", inputPlayer.Email).Return(domain.Player{}, expectedErr)
+	var expectedNewPlayer domain.Player
 
 	// Act
-	status, err := service.RegisterPlayerUseCase(inputPlayer)
+	newPlayer, status, err := service.RegisterPlayerUseCase(inputPlayer)
 
 	// Assert
 	assert.Error(t, err)
 	assert.Equal(t, expectedErr, err)
 	assert.Equal(t, RegisterPlayerPending, status)
+	assert.Equal(t, expectedNewPlayer, newPlayer)
 }
 
 func TestRegisterPlayerUseCase_SaveError(t *testing.T) {
@@ -243,14 +267,16 @@ func TestRegisterPlayerUseCase_SaveError(t *testing.T) {
 	repo.On("FindByEmail", inputPlayer.Email).Return(domain.Player{}, nil)
 	expectedErr := assert.AnError
 	repo.On("Save", mock.Anything).Return(expectedErr)
+	var expectedNewPlayer domain.Player
 
 	// Act
-	status, err := service.RegisterPlayerUseCase(inputPlayer)
+	newPlayer, status, err := service.RegisterPlayerUseCase(inputPlayer)
 
 	// Assert
 	assert.Error(t, err)
 	assert.Equal(t, expectedErr, err)
 	assert.Equal(t, RegisterPlayerPending, status)
+	assert.Equal(t, expectedNewPlayer, newPlayer)
 }
 
 func TestPlayerUseCase_UpdateError(t *testing.T) {
@@ -269,12 +295,14 @@ func TestPlayerUseCase_UpdateError(t *testing.T) {
 	repo.On("FindByID", inputPlayer.ID).Return(domain.Player{ID: inputPlayer.ID}, nil)
 	expectedErr := assert.AnError
 	repo.On("Update", mock.Anything).Return(expectedErr)
+	var expectedNewPlayer domain.Player
 
 	// Act
-	status, err := service.RegisterPlayerUseCase(inputPlayer)
+	newPlayer, status, err := service.RegisterPlayerUseCase(inputPlayer)
 
 	// Assert
 	assert.Error(t, err)
 	assert.Equal(t, expectedErr, err)
 	assert.Equal(t, RegisterPlayerPending, status)
+	assert.Equal(t, expectedNewPlayer, newPlayer)
 }

@@ -10,6 +10,7 @@ type UnregisterPlayerStatus uint8
 
 const (
 	UnregisterPlayerPending UnregisterPlayerStatus = iota
+	UnregisterPlayerInvalid
 	UnregisterPlayerNotFound
 	UnregisterPlayerDeleted
 )
@@ -24,6 +25,7 @@ func NewUnregisterPlayerUseCase(playerRepository domain.PlayerRepository,
 
 func (s *playerService) UnregisterPlayerUseCase(playerId string) (status UnregisterPlayerStatus, err error) {
 	if err := domain.ValidateID(playerId); err != nil {
+		status = UnregisterPlayerInvalid
 		return status, err
 	}
 	foundPlayer, err := s.playerRepo.FindByID(playerId)
