@@ -64,7 +64,7 @@ func (m *MockIDGenerator) GenerateIDWithPrefixes(p1, p2 string) string {
 	return fmt.Sprintf("%s-%s-%s", p1, p2, mockId)
 }
 
-func TestUpsertPlayerUseCase_Success(t *testing.T) {
+func TestRegisterPlayerUseCase_Success(t *testing.T) {
 	// Arrange
 	idGen := &MockIDGenerator{}
 	repo := &MockPlayerRepository{}
@@ -80,13 +80,14 @@ func TestUpsertPlayerUseCase_Success(t *testing.T) {
 	repo.On("Save", mock.Anything).Return(nil)
 
 	// Act
-	err := service.UpsertPlayerUseCase(inputPlayer)
+	status, err := service.RegisterPlayerUseCase(inputPlayer)
 
 	// Assert
 	assert.NoError(t, err)
+	assert.Equal(t, RegisterPlayerCreated, status)
 }
 
-func TestUpsertPlayerUseCase_UpdateExistingPlayerByID(t *testing.T) {
+func TestRegisterPlayerUseCase_UpdateExistingPlayerByID(t *testing.T) {
 	// Arrange
 	idGen := &MockIDGenerator{}
 	repo := &MockPlayerRepository{}
@@ -103,13 +104,14 @@ func TestUpsertPlayerUseCase_UpdateExistingPlayerByID(t *testing.T) {
 	repo.On("Update", mock.Anything).Return(nil)
 
 	// Act
-	err := service.UpsertPlayerUseCase(inputPlayer)
+	status, err := service.RegisterPlayerUseCase(inputPlayer)
 
 	// Assert
 	assert.NoError(t, err)
+	assert.Equal(t, RegisterPlayerUpdated, status)
 }
 
-func TestUpsertPlayerUseCase_UpdateExistingPlayerByEmail(t *testing.T) {
+func TestRegisterPlayerUseCase_UpdateExistingPlayerByEmail(t *testing.T) {
 	// Arrange
 	idGen := &MockIDGenerator{}
 	repo := &MockPlayerRepository{}
@@ -125,13 +127,14 @@ func TestUpsertPlayerUseCase_UpdateExistingPlayerByEmail(t *testing.T) {
 	repo.On("Update", mock.Anything).Return(nil)
 
 	// Act
-	err := service.UpsertPlayerUseCase(inputPlayer)
+	status, err := service.RegisterPlayerUseCase(inputPlayer)
 
 	// Assert
 	assert.NoError(t, err)
+	assert.Equal(t, RegisterPlayerUpdated, status)
 }
 
-func TestUpsertPlayerUseCase_ValidationError(t *testing.T) {
+func TestRegisterPlayerUseCase_ValidationError(t *testing.T) {
 	// Arrange
 	idGen := &MockIDGenerator{}
 	repo := &MockPlayerRepository{}
@@ -143,14 +146,15 @@ func TestUpsertPlayerUseCase_ValidationError(t *testing.T) {
 	assert.Error(t, expectedErr)
 
 	// Act
-	err := service.UpsertPlayerUseCase(inputPlayer)
+	status, err := service.RegisterPlayerUseCase(inputPlayer)
 
 	// Assert
 	assert.Error(t, err)
 	assert.Equal(t, expectedErr, err)
+	assert.Equal(t, RegisterPlayerPending, status)
 }
 
-func TestUpsertPlayerUseCase_FindByIDError(t *testing.T) {
+func TestRegisterPlayerUseCase_FindByIDError(t *testing.T) {
 	// Arrange
 	idGen := &MockIDGenerator{}
 	repo := &MockPlayerRepository{}
@@ -167,14 +171,15 @@ func TestUpsertPlayerUseCase_FindByIDError(t *testing.T) {
 	repo.On("FindByID", inputPlayer.ID).Return(domain.Player{}, expectedErr)
 
 	// Act
-	err := service.UpsertPlayerUseCase(inputPlayer)
+	status, err := service.RegisterPlayerUseCase(inputPlayer)
 
 	// Assert
 	assert.Error(t, err)
 	assert.Equal(t, expectedErr, err)
+	assert.Equal(t, RegisterPlayerPending, status)
 }
 
-func TestUpsertPlayerUseCase_FindByEmailError(t *testing.T) {
+func TestRegisterPlayerUseCase_FindByEmailError(t *testing.T) {
 	// Arrange
 	idGen := &MockIDGenerator{}
 	repo := &MockPlayerRepository{}
@@ -190,14 +195,15 @@ func TestUpsertPlayerUseCase_FindByEmailError(t *testing.T) {
 	repo.On("FindByEmail", inputPlayer.Email).Return(domain.Player{}, expectedErr)
 
 	// Act
-	err := service.UpsertPlayerUseCase(inputPlayer)
+	status, err := service.RegisterPlayerUseCase(inputPlayer)
 
 	// Assert
 	assert.Error(t, err)
 	assert.Equal(t, expectedErr, err)
+	assert.Equal(t, RegisterPlayerPending, status)
 }
 
-func TestUpsertPlayerUseCase_SaveError(t *testing.T) {
+func TestRegisterPlayerUseCase_SaveError(t *testing.T) {
 	// Arrange
 	idGen := &MockIDGenerator{}
 	repo := &MockPlayerRepository{}
@@ -214,14 +220,15 @@ func TestUpsertPlayerUseCase_SaveError(t *testing.T) {
 	repo.On("Save", mock.Anything).Return(expectedErr)
 
 	// Act
-	err := service.UpsertPlayerUseCase(inputPlayer)
+	status, err := service.RegisterPlayerUseCase(inputPlayer)
 
 	// Assert
 	assert.Error(t, err)
 	assert.Equal(t, expectedErr, err)
+	assert.Equal(t, RegisterPlayerPending, status)
 }
 
-func TestUpsertPlayerUseCase_UpdateError(t *testing.T) {
+func TestRegisterPlayerUseCase_UpdateError(t *testing.T) {
 	// Arrange
 	idGen := &MockIDGenerator{}
 	repo := &MockPlayerRepository{}
@@ -239,9 +246,10 @@ func TestUpsertPlayerUseCase_UpdateError(t *testing.T) {
 	repo.On("Update", mock.Anything).Return(expectedErr)
 
 	// Act
-	err := service.UpsertPlayerUseCase(inputPlayer)
+	status, err := service.RegisterPlayerUseCase(inputPlayer)
 
 	// Assert
 	assert.Error(t, err)
 	assert.Equal(t, expectedErr, err)
+	assert.Equal(t, RegisterPlayerPending, status)
 }

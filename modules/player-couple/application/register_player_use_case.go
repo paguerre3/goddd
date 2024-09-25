@@ -4,8 +4,20 @@ import (
 	"github.com/paguerre3/goddd/modules/player-couple/domain"
 )
 
-// UpsertPlayerUseCase registers a player or updates it if it already exists.
-func (s *PlayerCoupleService) UpsertPlayerUseCase(inputPlayer domain.Player) (err error) {
+type RegisterPlayerStatus uint8
+type UnregisterPlayerStatus uint8
+
+const (
+	RegisterPlayerPending RegisterPlayerStatus = iota
+	RegisterPlayerUpdated
+	RegisterPlayerCreated
+	UnregisterPlayerPending UnregisterPlayerStatus = iota
+	UnregisterPlayerNotFound
+	UnregisterPlayerDeleted
+)
+
+// RegisterPlayerUseCase registers a player or updates it if it already exists.
+func (s *PlayerCoupleService) RegisterPlayerUseCase(inputPlayer domain.Player) (status RegisterPlayerStatus, err error) {
 	// Validate new player entries.
 	newPlayer, err := domain.NewPlayer(s.idGen,
 		inputPlayer.Email,
@@ -14,7 +26,7 @@ func (s *PlayerCoupleService) UpsertPlayerUseCase(inputPlayer domain.Player) (er
 		inputPlayer.LastName,
 		inputPlayer.Age)
 	if err != nil {
-		return err
+		return status, err
 	}
 
 	// Check if the player already exists.
@@ -31,15 +43,37 @@ func (s *PlayerCoupleService) UpsertPlayerUseCase(inputPlayer domain.Player) (er
 		}
 	}
 	if err != nil {
-		return err
+		return status, err
 	}
 
 	// Ensure existing player isn't an empty struct:
 	if len(foundPlayer.ID) > 0 {
 		err = s.playerRepo.Update(*newPlayer)
+		if err == nil {
+			status = RegisterPlayerUpdated
+		}
 	} else {
 		err = s.playerRepo.Save(*newPlayer)
+		if err == nil {
+			status = RegisterPlayerCreated
+		}
 	}
 
-	return err
+	return status, err
+}
+
+func (s *PlayerCoupleService) UnregisterPlayerUseCase(playerId string) (status UnregisterPlayerStatus, err error) {
+	foundPlayer, err := s.playerRepo.FindByID(playerId)
+	if err != nil {
+		return status, err
+	}
+	if len(foundPlayer.ID) == 0 {
+		status = UnregisterPlayerNotFound
+		return status, nil
+	}
+	if err = s.playerRepo.Delete(playerId); err != nil {
+		return status, err
+	}
+	status = UnregisterPlayerDeleted
+	return status, nil
 }
