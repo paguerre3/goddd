@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -261,5 +262,184 @@ func TestFindPlayerByID(t *testing.T) {
 
 		// Assert
 		assert.Equal(t, http.StatusInternalServerError, c.Writer.Status())
+	})
+}
+
+func TestFindPlayerByEmail(t *testing.T) {
+	t.Run("Valid email, player found", func(t *testing.T) {
+		// Arrange
+		mockFindPlayerUseCase := &mockFindPlayerUseCase{}
+		playerHandler := &PlayerHandler{findPlayerUseCase: mockFindPlayerUseCase}
+		email := "test@example.com"
+		foundPlayer := domain.Player{ID: "1234567", Email: email}
+		mockFindPlayerUseCase.On("FindPlayerByEmailUseCase", email).Return(foundPlayer, application.FindPlayerFound, nil)
+		c, _ := gin.CreateTestContext(httptest.NewRecorder())
+
+		// Act
+		c.Params = gin.Params{{Key: "email", Value: email}}
+		playerHandler.FindPlayerByEmail(c)
+
+		// Assert
+		assert.Equal(t, http.StatusOK, c.Writer.Status())
+		mockFindPlayerUseCase.AssertCalled(t, "FindPlayerByEmailUseCase", email)
+	})
+
+	t.Run("Valid email, player not found", func(t *testing.T) {
+		// Arrange
+		mockFindPlayerUseCase := &mockFindPlayerUseCase{}
+		playerHandler := &PlayerHandler{findPlayerUseCase: mockFindPlayerUseCase}
+		email := "test@example.com"
+		mockFindPlayerUseCase.On("FindPlayerByEmailUseCase", email).Return(domain.Player{}, application.FindPlayerNotFound, nil)
+		c, _ := gin.CreateTestContext(httptest.NewRecorder())
+
+		// Act
+		c.Params = gin.Params{{Key: "email", Value: email}}
+		playerHandler.FindPlayerByEmail(c)
+
+		// Assert
+		assert.Equal(t, http.StatusNotFound, c.Writer.Status())
+		mockFindPlayerUseCase.AssertCalled(t, "FindPlayerByEmailUseCase", email)
+	})
+
+	t.Run("Invalid email", func(t *testing.T) {
+		// Arrange
+		mockFindPlayerUseCase := &mockFindPlayerUseCase{}
+		playerHandler := &PlayerHandler{findPlayerUseCase: mockFindPlayerUseCase}
+		email := "invalid-email"
+		expectedErr := domain.ValidateEmail(email)
+		mockFindPlayerUseCase.On("FindPlayerByEmailUseCase", email).Return(domain.Player{}, application.FindPlayerInvalid, expectedErr)
+		c, _ := gin.CreateTestContext(httptest.NewRecorder())
+
+		// Act
+		c.Params = gin.Params{{Key: "email", Value: email}}
+		playerHandler.FindPlayerByEmail(c)
+
+		// Assert
+		assert.Equal(t, http.StatusBadRequest, c.Writer.Status())
+		mockFindPlayerUseCase.AssertCalled(t, "FindPlayerByEmailUseCase", email)
+	})
+
+	t.Run("Error in findPlayerUseCase", func(t *testing.T) {
+		// Arrange
+		mockFindPlayerUseCase := &mockFindPlayerUseCase{}
+		playerHandler := &PlayerHandler{findPlayerUseCase: mockFindPlayerUseCase}
+		email := "test@example.com"
+		expectedErr := errors.New("some error")
+		mockFindPlayerUseCase.On("FindPlayerByEmailUseCase", email).Return(domain.Player{}, application.FindPlayerPending, expectedErr)
+		c, _ := gin.CreateTestContext(httptest.NewRecorder())
+
+		// Act
+		c.Params = gin.Params{{Key: "email", Value: email}}
+		playerHandler.FindPlayerByEmail(c)
+
+		// Assert
+		assert.Equal(t, http.StatusInternalServerError, c.Writer.Status())
+		mockFindPlayerUseCase.AssertCalled(t, "FindPlayerByEmailUseCase", email)
+	})
+}
+
+func TestFindPlayersByLastName(t *testing.T) {
+	t.Run("Valid last name with players found", func(t *testing.T) {
+		// Arrange
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+		c.Params = gin.Params{
+			{Key: "lastName", Value: "Doe"},
+		}
+		mockFindPlayerUseCase := &mockFindPlayerUseCase{}
+		mockFindPlayerUseCase.On("FindPlayersByLastNameUseCase", "Doe").Return(
+			[]domain.Player{{ID: "1234567", LastName: "Doe"}},
+			application.FindPlayerFound,
+			nil,
+		)
+		h := &PlayerHandler{findPlayerUseCase: mockFindPlayerUseCase}
+
+		// Act
+		h.FindPlayersByLastName(c)
+
+		// Assert
+		assert.Equal(t, http.StatusOK, w.Code)
+		var players []domain.Player
+		err := json.Unmarshal(w.Body.Bytes(), &players)
+		assert.NoError(t, err)
+		assert.Equal(t, []domain.Player{{ID: "1234567", LastName: "Doe"}}, players)
+	})
+
+	t.Run("Valid last name with no players found", func(t *testing.T) {
+		// Arrange
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+		c.Params = gin.Params{
+			{Key: "lastName", Value: "Doe"},
+		}
+		mockFindPlayerUseCase := &mockFindPlayerUseCase{}
+		mockFindPlayerUseCase.On("FindPlayersByLastNameUseCase", "Doe").Return(
+			[]domain.Player{},
+			application.FindPlayerNotFound,
+			nil,
+		)
+		h := &PlayerHandler{findPlayerUseCase: mockFindPlayerUseCase}
+
+		// Act
+		h.FindPlayersByLastName(c)
+
+		// Assert
+		assert.Equal(t, http.StatusNotFound, w.Code)
+		var players []domain.Player
+		err := json.Unmarshal(w.Body.Bytes(), &players)
+		assert.NoError(t, err)
+		assert.Empty(t, players)
+	})
+
+	t.Run("Invalid last name (empty string)", func(t *testing.T) {
+		// Arrange
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+		c.Params = gin.Params{
+			{Key: "lastName", Value: ""},
+		}
+		mockFindPlayerUseCase := &mockFindPlayerUseCase{}
+		mockFindPlayerUseCase.On("FindPlayersByLastNameUseCase", "").Return(
+			[]domain.Player{},
+			application.FindPlayerInvalid,
+			errors.New("invalid last name"),
+		)
+		h := &PlayerHandler{findPlayerUseCase: mockFindPlayerUseCase}
+
+		// Act
+		h.FindPlayersByLastName(c)
+
+		// Assert
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+		var err map[string]string
+		errUnmarshal := json.Unmarshal(w.Body.Bytes(), &err)
+		assert.NoError(t, errUnmarshal)
+		assert.Equal(t, map[string]string{"error": "invalid last name"}, err)
+	})
+
+	t.Run("Error in FindPlayersByLastNameUseCase", func(t *testing.T) {
+		// Arrange
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+		c.Params = gin.Params{
+			{Key: "lastName", Value: "Doe"},
+		}
+		mockFindPlayerUseCase := &mockFindPlayerUseCase{}
+		mockFindPlayerUseCase.On("FindPlayersByLastNameUseCase", "Doe").Return(
+			[]domain.Player{},
+			application.FindPlayerPending,
+			errors.New("internal error"),
+		)
+		h := &PlayerHandler{findPlayerUseCase: mockFindPlayerUseCase}
+
+		// Act
+		h.FindPlayersByLastName(c)
+
+		// Assert
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+		var err map[string]string
+		errUnmarshal := json.Unmarshal(w.Body.Bytes(), &err)
+		assert.NoError(t, errUnmarshal)
+		assert.Equal(t, map[string]string{"error": "internal error"}, err)
 	})
 }
