@@ -33,11 +33,11 @@ func (h *PlayerHandler) RegisterPlayer(c *gin.Context) {
 	}
 	newPlayer, status, err := h.registerPlayerUseCase.RegisterPlayerUseCase(player)
 	if err != nil {
-		errCode := http.StatusInternalServerError
 		if status == application.RegisterPlayerInvalid {
-			errCode = http.StatusBadRequest
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
 		}
-		c.JSON(errCode, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	switch status {
@@ -54,12 +54,53 @@ func (h *PlayerHandler) UnregisterPlayer(c *gin.Context) {
 	playerId := c.Param("playerId")
 	status, err := h.unregisterPlayerUseCase.UnregisterPlayerUseCase(playerId)
 	if err != nil {
-		errCode := http.StatusInternalServerError
 		if status == application.UnregisterPlayerInvalid {
-			errCode = http.StatusBadRequest
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
 		}
-		c.JSON(errCode, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, status)
+	if status == application.UnregisterPlayerNotFound {
+		c.JSON(http.StatusNotFound, gin.H{"status": status.String()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"status": status.String()})
+}
+
+func (h *PlayerHandler) FindPlayerByID(c *gin.Context) {
+	playerId := c.Param("playerId")
+	player, status, err := h.findPlayerUseCase.FindPlayerByIDUseCase(playerId)
+	handleFindResponse(c, player, status, err)
+}
+
+func (h *PlayerHandler) FindPlayerByEmail(c *gin.Context) {
+	email := c.Param("email")
+	player, status, err := h.findPlayerUseCase.FindPlayerByEmailUseCase(email)
+	handleFindResponse(c, player, status, err)
+}
+
+func (h *PlayerHandler) FindPlayersByLastName(c *gin.Context) {
+	lastName := c.Param("lastName")
+	players, status, err := h.findPlayerUseCase.FindPlayersByLastNameUseCase(lastName)
+	handleFindResponse(c, players, status, err)
+}
+
+func handleFindResponse[T domain.Player | []domain.Player](c *gin.Context, playerS T, status application.FindPlayerStatus, err error) {
+	if err != nil {
+		if status == application.FindPlayerInvalid {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	switch status {
+	case application.FindPlayerNotFound:
+		c.JSON(http.StatusNotFound, playerS)
+	case application.FindPlayerFound:
+		c.JSON(http.StatusOK, playerS)
+	default:
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("invalid status %d", status)})
+	}
 }

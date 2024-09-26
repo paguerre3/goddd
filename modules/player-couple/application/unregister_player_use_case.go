@@ -15,6 +15,11 @@ const (
 	UnregisterPlayerDeleted
 )
 
+// Implement the Stringer interface.
+func (s UnregisterPlayerStatus) String() string {
+	return [...]string{"UnregisterPlayerPending", "UnregisterPlayerInvalid", "UnregisterPlayerNotFound", "UnregisterPlayerDeleted"}[s]
+}
+
 func NewUnregisterPlayerUseCase(playerRepository domain.PlayerRepository,
 	idGenerator domain.IDGenerator) UnregisterPlayerUseCase {
 	return &playerService{

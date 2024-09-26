@@ -19,10 +19,11 @@ func TestFindPlayerByIDUseCase(t *testing.T) {
 		repo.On("FindByID", playerId).Return(foundPlayer, nil)
 
 		// Act
-		player, err := service.FindPlayerByIDUseCase(playerId)
+		player, status, err := service.FindPlayerByIDUseCase(playerId)
 
 		// Assert
 		assert.NoError(t, err)
+		assert.Equal(t, FindPlayerFound, status)
 		assert.Equal(t, foundPlayer, player)
 	})
 
@@ -35,11 +36,12 @@ func TestFindPlayerByIDUseCase(t *testing.T) {
 		expectedErr := domain.ValidateID(playerId)
 
 		// Act
-		player, err := service.FindPlayerByIDUseCase(playerId)
+		player, status, err := service.FindPlayerByIDUseCase(playerId)
 
 		// Assert
 		assert.Error(t, err)
 		assert.Equal(t, expectedErr, err)
+		assert.Equal(t, FindPlayerInvalid, status)
 		assert.Equal(t, domain.Player{}, player)
 	})
 
@@ -52,10 +54,11 @@ func TestFindPlayerByIDUseCase(t *testing.T) {
 		repo.On("FindByID", playerId).Return(domain.Player{}, nil)
 
 		// Act
-		player, err := service.FindPlayerByIDUseCase(playerId)
+		player, status, err := service.FindPlayerByIDUseCase(playerId)
 
 		// Assert
 		assert.NoError(t, err)
+		assert.Equal(t, FindPlayerNotFound, status)
 		assert.Equal(t, domain.Player{}, player)
 	})
 
@@ -69,11 +72,12 @@ func TestFindPlayerByIDUseCase(t *testing.T) {
 		repo.On("FindByID", playerId).Return(domain.Player{}, expectedErr)
 
 		// Act
-		player, err := service.FindPlayerByIDUseCase(playerId)
+		player, status, err := service.FindPlayerByIDUseCase(playerId)
 
 		// Assert
 		assert.Error(t, err)
 		assert.Equal(t, expectedErr, err)
+		assert.Equal(t, FindPlayerPending, status)
 		assert.Equal(t, domain.Player{}, player)
 	})
 }
@@ -85,14 +89,15 @@ func TestFindPlayerByEmailUseCase(t *testing.T) {
 		repo := &MockPlayerRepository{}
 		service := NewFindPlayerUseCase(repo, idGen)
 		email := "test@example.com"
-		foundPlayer := domain.Player{Email: email}
+		foundPlayer := domain.Player{ID: "1234567", Email: email}
 		repo.On("FindByEmail", email).Return(foundPlayer, nil)
 
 		// Act
-		player, err := service.FindPlayerByEmailUseCase(email)
+		player, status, err := service.FindPlayerByEmailUseCase(email)
 
 		// Assert
 		assert.NoError(t, err)
+		assert.Equal(t, FindPlayerFound, status)
 		assert.Equal(t, foundPlayer, player)
 	})
 
@@ -105,10 +110,11 @@ func TestFindPlayerByEmailUseCase(t *testing.T) {
 		repo.On("FindByEmail", email).Return(domain.Player{}, nil)
 
 		// Act
-		player, err := service.FindPlayerByEmailUseCase(email)
+		player, status, err := service.FindPlayerByEmailUseCase(email)
 
 		// Assert
 		assert.NoError(t, err)
+		assert.Equal(t, FindPlayerNotFound, status)
 		assert.Equal(t, domain.Player{}, player)
 	})
 
@@ -121,11 +127,12 @@ func TestFindPlayerByEmailUseCase(t *testing.T) {
 		expectedErr := domain.ValidateEmail(email)
 
 		// Act
-		player, err := service.FindPlayerByEmailUseCase(email)
+		player, status, err := service.FindPlayerByEmailUseCase(email)
 
 		// Assert
 		assert.Error(t, err)
 		assert.Equal(t, expectedErr, err)
+		assert.Equal(t, FindPlayerInvalid, status)
 		assert.Equal(t, domain.Player{}, player)
 	})
 
@@ -139,11 +146,12 @@ func TestFindPlayerByEmailUseCase(t *testing.T) {
 		repo.On("FindByEmail", email).Return(domain.Player{}, repoErr)
 
 		// Act
-		player, err := service.FindPlayerByEmailUseCase(email)
+		player, status, err := service.FindPlayerByEmailUseCase(email)
 
 		// Assert
 		assert.Error(t, err)
 		assert.Equal(t, repoErr, err)
+		assert.Equal(t, FindPlayerPending, status)
 		assert.Equal(t, domain.Player{}, player)
 	})
 }
@@ -154,15 +162,16 @@ func TestFindPlayersByLastNameUseCase(t *testing.T) {
 		repo := &MockPlayerRepository{}
 		service := NewFindPlayerUseCase(repo, &MockIDGenerator{})
 		lastName := "Doe"
-		expectedPlayers := []domain.Player{{ID: "1", LastName: "Doe"}}
+		expectedPlayers := []domain.Player{{ID: "1234567", LastName: "Doe"}}
 
 		repo.On("FindByLastName", lastName).Return(expectedPlayers, nil)
 
 		// Act
-		players, err := service.FindPlayersByLastNameUseCase(lastName)
+		players, status, err := service.FindPlayersByLastNameUseCase(lastName)
 
 		// Assert
 		assert.NoError(t, err)
+		assert.Equal(t, FindPlayerFound, status)
 		assert.Equal(t, expectedPlayers, players)
 	})
 
@@ -176,10 +185,11 @@ func TestFindPlayersByLastNameUseCase(t *testing.T) {
 		repo.On("FindByLastName", lastName).Return(expectedPlayers, nil)
 
 		// Act
-		players, err := service.FindPlayersByLastNameUseCase(lastName)
+		players, status, err := service.FindPlayersByLastNameUseCase(lastName)
 
 		// Assert
 		assert.NoError(t, err)
+		assert.Equal(t, FindPlayerNotFound, status)
 		assert.Equal(t, expectedPlayers, players)
 	})
 
@@ -191,11 +201,12 @@ func TestFindPlayersByLastNameUseCase(t *testing.T) {
 		expectedErr := domain.ValidateLastName(lastName)
 
 		// Act
-		players, err := service.FindPlayersByLastNameUseCase(lastName)
+		players, status, err := service.FindPlayersByLastNameUseCase(lastName)
 
 		// Assert
 		assert.Error(t, err)
 		assert.Equal(t, expectedErr, err)
+		assert.Equal(t, FindPlayerInvalid, status)
 		assert.Nil(t, players)
 	})
 
@@ -211,13 +222,14 @@ func TestFindPlayersByLastNameUseCase(t *testing.T) {
 		repo.On("FindByLastName", lastName).Return([]domain.Player{}, expectedErr)
 
 		// Act
-		players, err := service.FindPlayersByLastNameUseCase(lastName)
+		players, status, err := service.FindPlayersByLastNameUseCase(lastName)
 
 		// Assert
 		assert.Error(t, err)
 		assert.Equal(t, expectedErr, err)
 		// TODO: fix this
 		//assert.Nil(t, players)
+		assert.Equal(t, FindPlayerPending, status)
 		assert.Equal(t, []domain.Player{}, players)
 	})
 }

@@ -2,6 +2,7 @@ package application
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/paguerre3/goddd/modules/player-couple/domain"
@@ -97,4 +98,23 @@ func TestUnregisterPlayerUseCase(t *testing.T) {
 		assert.Equal(t, expectedErr, err)
 		assert.Equal(t, UnregisterPlayerPending, status)
 	})
+}
+
+func TestUnregisterPlayerStatusString(t *testing.T) {
+	tests := []struct {
+		status   UnregisterPlayerStatus
+		expected string
+	}{
+		{UnregisterPlayerPending, "UnregisterPlayerPending"},
+		{UnregisterPlayerInvalid, "UnregisterPlayerInvalid"},
+		{UnregisterPlayerNotFound, "UnregisterPlayerNotFound"},
+		{UnregisterPlayerDeleted, "UnregisterPlayerDeleted"},
+	}
+
+	for _, test := range tests {
+		actual := test.status.String()
+		if actual != test.expected {
+			assert.Equal(t, test.expected, actual, fmt.Sprintf("Expected UnregisterPlayerStatus.String() to return %q", test.expected))
+		}
+	}
 }
