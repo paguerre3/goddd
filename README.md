@@ -47,3 +47,10 @@ padel-tournament/
 └── go.mod                                   # Go modules
 ```
 
+
+---
+### DDD reading
+
+[Mastering DDD Repository Design Patterns in Go](https://medium.com/@yohata/mastering-ddd-repository-design-patterns-in-go-2034486c82b3)
+[DDD reference](https://www.domainlanguage.com/ddd/reference/)
+![DDD PDF reference](docs/DDD_Reference.pdf)
