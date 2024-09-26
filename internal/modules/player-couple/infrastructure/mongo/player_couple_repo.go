@@ -5,13 +5,16 @@ import (
 	"fmt"
 	"time"
 
+	common "github.com/paguerre3/goddd/internal/modules/common/mongo"
 	"github.com/paguerre3/goddd/internal/modules/player-couple/domain"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 const (
-	timeout = 5 * time.Second
+	timeout              = 5 * time.Second
+	playersColName       = "players"
+	playerCouplesColName = "player_couples"
 )
 
 type mongoPlayerRepository struct {
@@ -22,8 +25,8 @@ type mongoPlayerCoupleRepository struct {
 	collection *mongo.Collection
 }
 
-func NewMongoPlayerRepository(client *mongo.Client, dbName, collectionName string) domain.PlayerRepository {
-	collection := client.Database(dbName).Collection(collectionName)
+func NewMongoPlayerRepository(client common.MongoClient) domain.PlayerRepository {
+	collection := client.GetCollection(playersColName)
 	return &mongoPlayerRepository{collection: collection}
 }
 
@@ -89,8 +92,8 @@ func (r *mongoPlayerRepository) Delete(id string) error {
 	return err
 }
 
-func NewMongoPlayerCoupleRepository(client *mongo.Client, dbName, collectionName string) domain.PlayerCoupleRepository {
-	collection := client.Database(dbName).Collection(collectionName)
+func NewMongoPlayerCoupleRepository(client common.MongoClient) domain.PlayerCoupleRepository {
+	collection := client.GetCollection(playerCouplesColName)
 	return &mongoPlayerCoupleRepository{collection: collection}
 }
 
