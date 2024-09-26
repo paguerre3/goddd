@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/paguerre3/goddd/modules/player-couple/domain"
+	"github.com/paguerre3/goddd/internal/modules/player-couple/domain"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

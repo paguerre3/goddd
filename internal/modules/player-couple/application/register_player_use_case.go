@@ -1,7 +1,7 @@
 package application
 
 import (
-	"github.com/paguerre3/goddd/modules/player-couple/domain"
+	"github.com/paguerre3/goddd/internal/modules/player-couple/domain"
 )
 
 type RegisterPlayerUseCase interface {

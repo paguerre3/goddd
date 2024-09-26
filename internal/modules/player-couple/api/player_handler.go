@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/paguerre3/goddd/modules/player-couple/application"
-	"github.com/paguerre3/goddd/modules/player-couple/domain"
+	"github.com/paguerre3/goddd/internal/modules/player-couple/application"
+	"github.com/paguerre3/goddd/internal/modules/player-couple/domain"
 )
 
 type PlayerHandler struct {

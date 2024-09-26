@@ -1,6 +1,6 @@
 package application
 
-import "github.com/paguerre3/goddd/modules/player-couple/domain"
+import "github.com/paguerre3/goddd/internal/modules/player-couple/domain"
 
 type UnregisterPlayerUseCase interface {
 	UnregisterPlayerUseCase(playerId string) (status UnregisterPlayerStatus, err error)
