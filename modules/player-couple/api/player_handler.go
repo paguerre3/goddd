@@ -65,6 +65,10 @@ func (h *PlayerHandler) UnregisterPlayer(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"status": status.String()})
 		return
 	}
+	if status == application.UnregisterPlayerPending {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("invalid status %d", status)})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{"status": status.String()})
 }
 
