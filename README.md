@@ -55,5 +55,5 @@ padel-tournament/
 
 [DDD site reference](https://www.domainlanguage.com/ddd/reference/)
 
-[DDD PDF reference](docs/DDD_Reference.pdf)
+[DDD PDF reference](docs/DDD_Reference_2015-03.pdf)
 
