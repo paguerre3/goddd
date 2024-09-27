@@ -25,6 +25,9 @@ type mongoClient struct {
 var (
 	mongoInstance *mongoClient
 	once          sync.Once
+	applyURI      = options.Client().ApplyURI
+	mongoConnect  = mongo.Connect
+	getEnv        = os.Getenv
 )
 
 const (
@@ -38,11 +41,11 @@ func NewMongoClient() MongoClient {
 	once.Do(func() {
 		mongoURI := resolveMongoUri()
 
-		clientOptions := options.Client().ApplyURI(mongoURI)
+		clientOptions := applyURI(mongoURI)
 		ctx, cancel := context.WithTimeout(context.Background(), timeout)
 		defer cancel()
 
-		client, err := mongo.Connect(ctx, clientOptions)
+		client, err := mongoConnect(ctx, clientOptions)
 		if err != nil {
 			log.Fatalf("Failed to connect to MongoDB: %v", err)
 		}
@@ -84,7 +87,7 @@ func (m *mongoClient) Close() error {
 }
 
 func resolveMongoUri() string {
-	uri := os.Getenv("MONGO_ADDR")
+	uri := getEnv("MONGO_ADDR")
 	if len(uri) > 0 {
 		return uri
 	}
