@@ -96,6 +96,21 @@ func TestMongoPlayerRepository_FindByID_Success(t *testing.T) {
 	})
 }
 
+func TestMongoPlayerRepository_FindByID_NotFound(t *testing.T) {
+	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
+
+	mt.Run("Find player by ID not found", func(mt *mtest.T) {
+		mongoClientMock := NewMongoClientMock(mt.Client)
+		repo := NewMongoPlayerRepository(mongoClientMock)
+
+		mt.AddMockResponses(mtest.CreateCursorResponse(0, testPlayersNs, mtest.FirstBatch))
+
+		result, err := repo.FindByID("1")
+		assert.NoError(t, err)
+		assert.Equal(t, domain.Player{}, result, "Expected result to be empty player")
+	})
+}
+
 func TestMongoPlayerRepository_FindByID_Fail(t *testing.T) {
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 
@@ -103,7 +118,7 @@ func TestMongoPlayerRepository_FindByID_Fail(t *testing.T) {
 		mongoClientMock := NewMongoClientMock(mt.Client)
 		repo := NewMongoPlayerRepository(mongoClientMock)
 
-		mt.AddMockResponses(mtest.CreateCursorResponse(0, testPlayersNs, mtest.FirstBatch))
+		mt.AddMockResponses(mtest.CreateCursorResponse(-1, testPlayersNs, mtest.FirstBatch))
 
 		result, err := repo.FindByID("1")
 		assert.Error(t, err, "Expected error when finding player by ID")
@@ -132,6 +147,21 @@ func TestMongoPlayerRepository_FindByEmail_Success(t *testing.T) {
 	})
 }
 
+func TestMongoPlayerRepository_FindByEmail_NotFound(t *testing.T) {
+	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
+
+	mt.Run("Find player by email not found", func(mt *mtest.T) {
+		mongoClientMock := NewMongoClientMock(mt.Client)
+		repo := NewMongoPlayerRepository(mongoClientMock)
+
+		mt.AddMockResponses(mtest.CreateCursorResponse(0, testPlayersNs, mtest.FirstBatch))
+
+		result, err := repo.FindByEmail("john.doe@example.com")
+		assert.NoError(t, err)
+		assert.Equal(t, domain.Player{}, result, "Expected result to be empty player")
+	})
+}
+
 func TestMongoPlayerRepository_FindByEmail_Fail(t *testing.T) {
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 
@@ -139,7 +169,7 @@ func TestMongoPlayerRepository_FindByEmail_Fail(t *testing.T) {
 		mongoClientMock := NewMongoClientMock(mt.Client)
 		repo := NewMongoPlayerRepository(mongoClientMock)
 
-		mt.AddMockResponses(mtest.CreateCursorResponse(0, testPlayersNs, mtest.FirstBatch))
+		mt.AddMockResponses(mtest.CreateCursorResponse(-1, testPlayersNs, mtest.FirstBatch))
 
 		result, err := repo.FindByEmail("john.doe@example.com")
 		assert.Error(t, err, "Expected error when finding player by email")
@@ -321,8 +351,18 @@ func TestMongoPlayerCoupleRepository_FindByID(t *testing.T) {
 		assert.Equal(t, playerCouple, result, "Expected player couple to match")
 	})
 
-	mt.Run("failure", func(mt *mtest.T) {
+	mt.Run("not found", func(mt *mtest.T) {
 		mt.AddMockResponses(mtest.CreateCursorResponse(0, testPlayerCouplesNs, mtest.FirstBatch))
+
+		mongoClientMock := NewMongoClientMock(mt.Client)
+		repo := NewMongoPlayerCoupleRepository(mongoClientMock)
+		pc, err := repo.FindByID("c2")
+		assert.NoError(t, err, "Expected no error when player couple not found")
+		assert.Equal(t, domain.PlayerCouple{}, pc, "Expected empty player couple")
+	})
+
+	mt.Run("failure", func(mt *mtest.T) {
+		mt.AddMockResponses(mtest.CreateCursorResponse(-1, testPlayerCouplesNs, mtest.FirstBatch))
 
 		mongoClientMock := NewMongoClientMock(mt.Client)
 		repo := NewMongoPlayerCoupleRepository(mongoClientMock)

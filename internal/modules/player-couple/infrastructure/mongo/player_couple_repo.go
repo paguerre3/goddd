@@ -44,6 +44,9 @@ func (r *mongoPlayerRepository) FindByID(id string) (domain.Player, error) {
 
 	var player domain.Player
 	err := r.collection.FindOne(ctx, bson.M{"id": id}).Decode(&player)
+	if mongo.ErrNoDocuments == err {
+		return player, nil
+	}
 	return player, err
 }
 
@@ -53,6 +56,9 @@ func (r *mongoPlayerRepository) FindByEmail(email string) (domain.Player, error)
 
 	var player domain.Player
 	err := r.collection.FindOne(ctx, bson.M{"email": email}).Decode(&player)
+	if mongo.ErrNoDocuments == err {
+		return player, nil
+	}
 	return player, err
 }
 
@@ -60,8 +66,9 @@ func (r *mongoPlayerRepository) FindByLastName(lastName string) ([]domain.Player
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	cursor, err := r.collection.Find(ctx, bson.M{"lastName": lastName})
-	if err != nil {
+	// must be "all" lower case as mongo stores it in lower case, even if in the vew is showed in camel case:
+	cursor, err := r.collection.Find(ctx, bson.M{"lastname": lastName})
+	if err != nil && mongo.ErrNoDocuments != err {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
@@ -111,6 +118,9 @@ func (r *mongoPlayerCoupleRepository) FindByID(id string) (domain.PlayerCouple, 
 
 	var playerCouple domain.PlayerCouple
 	err := r.collection.FindOne(ctx, bson.M{"id": id}).Decode(&playerCouple)
+	if mongo.ErrNoDocuments == err {
+		return playerCouple, nil
+	}
 	return playerCouple, err
 }
 
@@ -122,7 +132,7 @@ func (r *mongoPlayerCoupleRepository) FindByPrefixes(lastNamePlayer1, lastNamePl
 	cursor, err := r.collection.Find(ctx, bson.M{
 		"id": bson.M{"$regex": "^" + prefix},
 	})
-	if err != nil {
+	if err != nil && mongo.ErrNoDocuments != err {
 		return nil, err
 	}
 	defer cursor.Close(ctx)
