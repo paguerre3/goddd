@@ -49,6 +49,17 @@ padel-tournament/
 
 
 ---
+### Requirements
+1. ⚠️Docker must be running before executing Application.
+2. <code>docker-compose -f docker-compose.yml up -d</code> before running tests or application. 
+3. [Mongo Express URI](http://localhost:8081/)
+
+***Optional***: Running under WSL needs allowing traffic through the firewall, i.e. 
+using PS <code>New-NetFirewallRule -DisplayName "Allow MongoDB" -Direction Inbound -LocalPort 27017 -Protocol TCP -Action Allow</code>
+and <code>New-NetFirewallRule -DisplayName "Allow MongoExpress" -Direction Inbound -LocalPort 8081 -Protocol TCP -Action Allow</code>.  
+
+
+---
 ### DDD reading
 
 [Mastering DDD Repository Design Patterns in Go](https://medium.com/@yohata/mastering-ddd-repository-design-patterns-in-go-2034486c82b3)
@@ -56,4 +67,3 @@ padel-tournament/
 [DDD site reference](https://www.domainlanguage.com/ddd/reference/)
 
 [DDD PDF reference](docs/DDD_Reference_2015-03.pdf)
-
