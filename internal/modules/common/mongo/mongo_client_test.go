@@ -33,6 +33,21 @@ func TestNewMongoClient(t *testing.T) {
 
 		mongoClient := NewMongoClient()
 		assert.NotNil(t, mongoClient)
+		tc := mongoClient.GetCollection("testCol")
+		assert.NotNil(t, tc)
+		// 1.13.0 the Close() method for mtest package is removed, this method is not necessary.
+		// Debugging the following code will succeed but the test at the end fails as it will call
+		// the Close again automatically, i.e. close of closed channel already performed:
+		//
+		// 2024/09/26 23:10:00 Connected to MongoDB!
+		// 2024/09/26 23:10:25 Disconnected from MongoDB
+		// --- FAIL: TestNewMongoClient (52.28s)
+		// --- FAIL: TestNewMongoClient/success (52.28s)
+		// panic: close of closed channel [recovered]
+		// panic: close of closed channel
+		//
+		// err := mongoClient.Close()
+		// assert.NoError(t, err)
 	})
 
 	mt.Run("mongoConnect fatal", func(mt *mtest.T) {
