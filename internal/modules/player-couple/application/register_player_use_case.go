@@ -17,20 +17,15 @@ const (
 	RegisterPlayerCreated
 )
 
-func NewRegisterPlayerUseCase(idGenerator domain.IDGenerator,
-	playerRepository domain.PlayerRepository) RegisterPlayerUseCase {
-	return &playerService{
-		idGen:      idGenerator,
-		playerRepo: playerRepository,
-	}
+func NewRegisterPlayerUseCase(playerRepository domain.PlayerRepository) RegisterPlayerUseCase {
+	return &playerService{playerRepo: playerRepository}
 }
 
 // RegisterPlayerUseCase registers a player or updates it if it already exists.
 func (s *playerService) RegisterPlayerUseCase(inputPlayer domain.Player) (newPlayer domain.Player,
 	status RegisterPlayerStatus, err error) {
 	// Validate new player entries.
-	newPlayerRef, err := domain.NewPlayer(s.idGen,
-		inputPlayer.Email,
+	newPlayerRef, err := domain.NewPlayer(inputPlayer.Email,
 		inputPlayer.SocialSecurityNumber,
 		inputPlayer.FirstName,
 		inputPlayer.LastName,
@@ -50,20 +45,19 @@ func (s *playerService) RegisterPlayerUseCase(inputPlayer domain.Player) (newPla
 	if len(foundPlayer.ID) > 0 {
 		// Ensure to overwrite auto generated ID of new player.
 		newPlayerRef.ID = foundPlayer.ID
-		err = s.playerRepo.Update(*newPlayerRef)
-		if err == nil {
-			status = RegisterPlayerUpdated
-		}
+		status = RegisterPlayerUpdated
 	} else {
 		// A valid ID never overwrites the auto generated one during creation.
-		err = s.playerRepo.Save(*newPlayerRef)
-		if err == nil {
-			status = RegisterPlayerCreated
-		}
+		status = RegisterPlayerCreated
 	}
-	if err == nil {
-		newPlayer = *newPlayerRef
+
+	err = s.playerRepo.Upsert(newPlayerRef)
+	if err != nil {
+		status = RegisterPlayerPending
+		return newPlayer, status, err
 	}
+
+	newPlayer = *newPlayerRef
 	return newPlayer, status, err
 }
 

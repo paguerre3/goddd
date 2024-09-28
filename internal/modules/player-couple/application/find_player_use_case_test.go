@@ -11,9 +11,8 @@ import (
 func TestFindPlayerByIDUseCase(t *testing.T) {
 	t.Run("Valid ID player found", func(t *testing.T) {
 		// Arrange
-		idGen := &MockIDGenerator{}
-		repo := &MockPlayerRepository{}
-		service := NewFindPlayerUseCase(idGen, repo)
+		repo := &mockPlayerRepository{}
+		service := NewFindPlayerUseCase(repo)
 		playerId := "valid-id"
 		foundPlayer := domain.Player{ID: playerId}
 		repo.On("FindByID", playerId).Return(foundPlayer, nil)
@@ -29,9 +28,8 @@ func TestFindPlayerByIDUseCase(t *testing.T) {
 
 	t.Run("Invalid player ID", func(t *testing.T) {
 		// Arrange
-		idGen := &MockIDGenerator{}
-		repo := &MockPlayerRepository{}
-		service := NewFindPlayerUseCase(idGen, repo)
+		repo := &mockPlayerRepository{}
+		service := NewFindPlayerUseCase(repo)
 		playerId := "i" // invalid id
 		expectedErr := domain.ValidateID(playerId)
 
@@ -47,9 +45,8 @@ func TestFindPlayerByIDUseCase(t *testing.T) {
 
 	t.Run("Player not found", func(t *testing.T) {
 		// Arrange
-		idGen := &MockIDGenerator{}
-		repo := &MockPlayerRepository{}
-		service := NewFindPlayerUseCase(idGen, repo)
+		repo := &mockPlayerRepository{}
+		service := NewFindPlayerUseCase(repo)
 		playerId := "not-found-id"
 		repo.On("FindByID", playerId).Return(domain.Player{}, nil)
 
@@ -64,9 +61,8 @@ func TestFindPlayerByIDUseCase(t *testing.T) {
 
 	t.Run("Error in repository finding by ID", func(t *testing.T) {
 		// Arrange
-		idGen := &MockIDGenerator{}
-		repo := &MockPlayerRepository{}
-		service := NewFindPlayerUseCase(idGen, repo)
+		repo := &mockPlayerRepository{}
+		service := NewFindPlayerUseCase(repo)
 		playerId := "error-id"
 		expectedErr := errors.New("repo error")
 		repo.On("FindByID", playerId).Return(domain.Player{}, expectedErr)
@@ -85,9 +81,8 @@ func TestFindPlayerByIDUseCase(t *testing.T) {
 func TestFindPlayerByEmailUseCase(t *testing.T) {
 	t.Run("Valid email player found", func(t *testing.T) {
 		// Arrange
-		idGen := &MockIDGenerator{}
-		repo := &MockPlayerRepository{}
-		service := NewFindPlayerUseCase(idGen, repo)
+		repo := &mockPlayerRepository{}
+		service := NewFindPlayerUseCase(repo)
 		email := "test@example.com"
 		foundPlayer := domain.Player{ID: "1234567", Email: email}
 		repo.On("FindByEmail", email).Return(foundPlayer, nil)
@@ -103,9 +98,8 @@ func TestFindPlayerByEmailUseCase(t *testing.T) {
 
 	t.Run("Valid email not player found", func(t *testing.T) {
 		// Arrange
-		idGen := &MockIDGenerator{}
-		repo := &MockPlayerRepository{}
-		service := NewFindPlayerUseCase(idGen, repo)
+		repo := &mockPlayerRepository{}
+		service := NewFindPlayerUseCase(repo)
 		email := "test@example.com"
 		repo.On("FindByEmail", email).Return(domain.Player{}, nil)
 
@@ -120,9 +114,8 @@ func TestFindPlayerByEmailUseCase(t *testing.T) {
 
 	t.Run("Invalid email", func(t *testing.T) {
 		// Arrange
-		idGen := &MockIDGenerator{}
-		repo := &MockPlayerRepository{}
-		service := NewFindPlayerUseCase(idGen, repo)
+		repo := &mockPlayerRepository{}
+		service := NewFindPlayerUseCase(repo)
 		email := "invalid-email"
 		expectedErr := domain.ValidateEmail(email)
 
@@ -138,9 +131,8 @@ func TestFindPlayerByEmailUseCase(t *testing.T) {
 
 	t.Run("Error in repository finding by email", func(t *testing.T) {
 		// Arrange
-		idGen := &MockIDGenerator{}
-		repo := &MockPlayerRepository{}
-		service := NewFindPlayerUseCase(idGen, repo)
+		repo := &mockPlayerRepository{}
+		service := NewFindPlayerUseCase(repo)
 		email := "test@example.com"
 		repoErr := errors.New("repository error")
 		repo.On("FindByEmail", email).Return(domain.Player{}, repoErr)
@@ -159,8 +151,8 @@ func TestFindPlayerByEmailUseCase(t *testing.T) {
 func TestFindPlayersByLastNameUseCase(t *testing.T) {
 	t.Run("Valid last name players found", func(t *testing.T) {
 		// Arrange
-		repo := &MockPlayerRepository{}
-		service := NewFindPlayerUseCase(&MockIDGenerator{}, repo)
+		repo := &mockPlayerRepository{}
+		service := NewFindPlayerUseCase(repo)
 		lastName := "Doe"
 		expectedPlayers := []domain.Player{{ID: "1234567", LastName: "Doe"}}
 
@@ -177,8 +169,8 @@ func TestFindPlayersByLastNameUseCase(t *testing.T) {
 
 	t.Run("Valid last name players not found", func(t *testing.T) {
 		// Arrange
-		repo := &MockPlayerRepository{}
-		service := NewFindPlayerUseCase(&MockIDGenerator{}, repo)
+		repo := &mockPlayerRepository{}
+		service := NewFindPlayerUseCase(repo)
 		lastName := "Doe"
 		var expectedPlayers []domain.Player = nil
 
@@ -195,8 +187,8 @@ func TestFindPlayersByLastNameUseCase(t *testing.T) {
 
 	t.Run("Invalid last name players not browsed", func(t *testing.T) {
 		// Arrange
-		repo := &MockPlayerRepository{}
-		service := NewFindPlayerUseCase(&MockIDGenerator{}, repo)
+		repo := &mockPlayerRepository{}
+		service := NewFindPlayerUseCase(repo)
 		lastName := ""
 		expectedErr := domain.ValidateLastName(lastName)
 
@@ -212,8 +204,8 @@ func TestFindPlayersByLastNameUseCase(t *testing.T) {
 
 	t.Run("Error in repository finding by last name", func(t *testing.T) {
 		// Arrange
-		repo := &MockPlayerRepository{}
-		service := NewFindPlayerUseCase(&MockIDGenerator{}, repo)
+		repo := &mockPlayerRepository{}
+		service := NewFindPlayerUseCase(repo)
 		lastName := "Doe"
 		expectedErr := errors.New("repo error")
 

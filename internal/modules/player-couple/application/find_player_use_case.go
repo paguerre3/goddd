@@ -17,12 +17,8 @@ const (
 	FindPlayerFound
 )
 
-func NewFindPlayerUseCase(idGenerator domain.IDGenerator,
-	playerRepository domain.PlayerRepository) FindPlayerUseCase {
-	return &playerService{
-		idGen:      idGenerator,
-		playerRepo: playerRepository,
-	}
+func NewFindPlayerUseCase(playerRepository domain.PlayerRepository) FindPlayerUseCase {
+	return &playerService{playerRepo: playerRepository}
 }
 
 func (s *playerService) FindPlayerByIDUseCase(playerId string) (domain.Player, FindPlayerStatus, error) {

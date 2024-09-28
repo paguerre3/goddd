@@ -13,62 +13,61 @@ const (
 	mockId = "mock-id"
 )
 
-type MockPlayerRepository struct {
+type mockPlayerRepository struct {
 	mock.Mock
 }
 
-func (m *MockPlayerRepository) Save(player domain.Player) error {
+func (m *mockPlayerRepository) Upsert(player *domain.Player) error {
 	args := m.Called(player)
+	if player.ID == "" {
+		idGen := mockIDGenerator{}
+		player.ID = idGen.GenerateID()
+	}
 	return args.Error(0)
 }
 
-func (m *MockPlayerRepository) FindByID(id string) (domain.Player, error) {
+func (m *mockPlayerRepository) FindByID(id string) (domain.Player, error) {
 	args := m.Called(id)
 	return args.Get(0).(domain.Player), args.Error(1)
 }
 
-func (m *MockPlayerRepository) FindByEmail(email string) (domain.Player, error) {
+func (m *mockPlayerRepository) FindByEmail(email string) (domain.Player, error) {
 	args := m.Called(email)
 	return args.Get(0).(domain.Player), args.Error(1)
 }
 
-func (m *MockPlayerRepository) FindByLastName(lastName string) ([]domain.Player, error) {
+func (m *mockPlayerRepository) FindByLastName(lastName string) ([]domain.Player, error) {
 	args := m.Called(lastName)
 	return args.Get(0).([]domain.Player), args.Error(1)
 }
 
-func (m *MockPlayerRepository) Update(player domain.Player) error {
-	args := m.Called(player)
-	return args.Error(0)
-}
-
-func (m *MockPlayerRepository) Delete(id string) error {
+func (m *mockPlayerRepository) Delete(id string) error {
 	args := m.Called(id)
 	return args.Error(0)
 }
 
 // Mock IDGenerator for testing without breaking modularity principle even in testing domain module package.
-type MockIDGenerator struct {
+type mockIDGenerator struct {
 	// molck aggregate used as a helper mock to avoid repetitions:
 	aggregate *string
 }
 
-func (m *MockIDGenerator) GenerateID() string {
+func (m *mockIDGenerator) GenerateID() string {
 	if m.aggregate != nil {
 		return fmt.Sprintf("%s-%s", mockId, *m.aggregate)
 	}
 	return mockId
 }
 
-func (m *MockIDGenerator) GenerateIDWithPrefixes(p1, p2 string) string {
+func (m *mockIDGenerator) GenerateIDWithPrefixes(p1, p2 string) string {
 	return fmt.Sprintf("%s-%s-%s", p1, p2, mockId)
 }
 
 func TestRegisterPlayerUseCase_Success(t *testing.T) {
 	// Arrange
-	idGen := &MockIDGenerator{}
-	repo := &MockPlayerRepository{}
-	service := NewRegisterPlayerUseCase(idGen, repo)
+	idGen := &mockIDGenerator{}
+	repo := &mockPlayerRepository{}
+	service := NewRegisterPlayerUseCase(repo)
 	inputPlayer := domain.Player{
 		FirstName: "John",
 		LastName:  "Doe",
@@ -77,7 +76,7 @@ func TestRegisterPlayerUseCase_Success(t *testing.T) {
 
 	// Expect
 	repo.On("FindByEmail", inputPlayer.Email).Return(domain.Player{}, nil)
-	repo.On("Save", mock.Anything).Return(nil)
+	repo.On("Upsert", mock.Anything).Return(nil)
 	expectedNewPlayer := domain.Player{
 		ID:        idGen.GenerateID(),
 		FirstName: "John",
@@ -96,9 +95,8 @@ func TestRegisterPlayerUseCase_Success(t *testing.T) {
 
 func TestRegisterPlayerUseCase_UpdateExistingPlayerByID(t *testing.T) {
 	// Arrange
-	idGen := &MockIDGenerator{}
-	repo := &MockPlayerRepository{}
-	service := NewRegisterPlayerUseCase(idGen, repo)
+	repo := &mockPlayerRepository{}
+	service := NewRegisterPlayerUseCase(repo)
 	inputPlayer := domain.Player{
 		ID:        "existing-id",
 		FirstName: "John",
@@ -108,7 +106,7 @@ func TestRegisterPlayerUseCase_UpdateExistingPlayerByID(t *testing.T) {
 
 	// Expect
 	repo.On("FindByID", inputPlayer.ID).Return(domain.Player{ID: inputPlayer.ID}, nil)
-	repo.On("Update", mock.Anything).Return(nil)
+	repo.On("Upsert", mock.Anything).Return(nil)
 	expectedNewPlayer := inputPlayer
 
 	// Act
@@ -122,9 +120,8 @@ func TestRegisterPlayerUseCase_UpdateExistingPlayerByID(t *testing.T) {
 
 func TestRegisterPlayerUseCase_UpdateExistingPlayerByIDValidationError(t *testing.T) {
 	// Arrange
-	idGen := &MockIDGenerator{}
-	repo := &MockPlayerRepository{}
-	service := NewRegisterPlayerUseCase(idGen, repo)
+	repo := &mockPlayerRepository{}
+	service := NewRegisterPlayerUseCase(repo)
 	inputPlayer := domain.Player{
 		// Invalid ID
 		ID:        "i",
@@ -149,9 +146,8 @@ func TestRegisterPlayerUseCase_UpdateExistingPlayerByIDValidationError(t *testin
 
 func TestRegisterPlayerUseCase_UpdateExistingPlayerByEmail(t *testing.T) {
 	// Arrange
-	idGen := &MockIDGenerator{}
-	repo := &MockPlayerRepository{}
-	service := NewRegisterPlayerUseCase(idGen, repo)
+	repo := &mockPlayerRepository{}
+	service := NewRegisterPlayerUseCase(repo)
 	inputPlayer := domain.Player{
 		FirstName: "John",
 		LastName:  "Doe",
@@ -160,7 +156,7 @@ func TestRegisterPlayerUseCase_UpdateExistingPlayerByEmail(t *testing.T) {
 
 	// Expect
 	repo.On("FindByEmail", inputPlayer.Email).Return(domain.Player{ID: "existing-id"}, nil)
-	repo.On("Update", mock.Anything).Return(nil)
+	repo.On("Upsert", mock.Anything).Return(nil)
 	expectedNewPlayer := domain.Player{
 		ID:        "existing-id",
 		FirstName: "John",
@@ -179,13 +175,12 @@ func TestRegisterPlayerUseCase_UpdateExistingPlayerByEmail(t *testing.T) {
 
 func TestRegisterPlayerUseCase_ValidationError(t *testing.T) {
 	// Arrange
-	idGen := &MockIDGenerator{}
-	repo := &MockPlayerRepository{}
-	service := NewRegisterPlayerUseCase(idGen, repo)
+	repo := &mockPlayerRepository{}
+	service := NewRegisterPlayerUseCase(repo)
 	inputPlayer := domain.Player{Email: ""}
 
 	// Expect
-	_, expectedErr := domain.NewPlayer(idGen, inputPlayer.Email, nil, "", "", nil)
+	_, expectedErr := domain.NewPlayer(inputPlayer.Email, nil, "", "", nil)
 	assert.Error(t, expectedErr)
 	var expectedNewPlayer domain.Player
 
@@ -201,9 +196,8 @@ func TestRegisterPlayerUseCase_ValidationError(t *testing.T) {
 
 func TestRegisterPlayerUseCase_FindByIDError(t *testing.T) {
 	// Arrange
-	idGen := &MockIDGenerator{}
-	repo := &MockPlayerRepository{}
-	service := NewRegisterPlayerUseCase(idGen, repo)
+	repo := &mockPlayerRepository{}
+	service := NewRegisterPlayerUseCase(repo)
 	inputPlayer := domain.Player{
 		ID:        "existing-id",
 		FirstName: "John",
@@ -228,9 +222,8 @@ func TestRegisterPlayerUseCase_FindByIDError(t *testing.T) {
 
 func TestRegisterPlayerUseCase_FindByEmailError(t *testing.T) {
 	// Arrange
-	idGen := &MockIDGenerator{}
-	repo := &MockPlayerRepository{}
-	service := NewRegisterPlayerUseCase(idGen, repo)
+	repo := &mockPlayerRepository{}
+	service := NewRegisterPlayerUseCase(repo)
 	inputPlayer := domain.Player{
 		FirstName: "John",
 		LastName:  "Doe",
@@ -254,9 +247,8 @@ func TestRegisterPlayerUseCase_FindByEmailError(t *testing.T) {
 
 func TestRegisterPlayerUseCase_SaveError(t *testing.T) {
 	// Arrange
-	idGen := &MockIDGenerator{}
-	repo := &MockPlayerRepository{}
-	service := NewRegisterPlayerUseCase(idGen, repo)
+	repo := &mockPlayerRepository{}
+	service := NewRegisterPlayerUseCase(repo)
 	inputPlayer := domain.Player{
 		FirstName: "John",
 		LastName:  "Doe",
@@ -266,7 +258,7 @@ func TestRegisterPlayerUseCase_SaveError(t *testing.T) {
 	// Expect
 	repo.On("FindByEmail", inputPlayer.Email).Return(domain.Player{}, nil)
 	expectedErr := assert.AnError
-	repo.On("Save", mock.Anything).Return(expectedErr)
+	repo.On("Upsert", mock.Anything).Return(expectedErr)
 	var expectedNewPlayer domain.Player
 
 	// Act
@@ -281,9 +273,8 @@ func TestRegisterPlayerUseCase_SaveError(t *testing.T) {
 
 func TestPlayerUseCase_UpdateError(t *testing.T) {
 	// Arrange
-	idGen := &MockIDGenerator{}
-	repo := &MockPlayerRepository{}
-	service := NewRegisterPlayerUseCase(idGen, repo)
+	repo := &mockPlayerRepository{}
+	service := NewRegisterPlayerUseCase(repo)
 	inputPlayer := domain.Player{
 		ID:        "existing-id",
 		FirstName: "John",
@@ -294,7 +285,7 @@ func TestPlayerUseCase_UpdateError(t *testing.T) {
 	// Expect
 	repo.On("FindByID", inputPlayer.ID).Return(domain.Player{ID: inputPlayer.ID}, nil)
 	expectedErr := assert.AnError
-	repo.On("Update", mock.Anything).Return(expectedErr)
+	repo.On("Upsert", mock.Anything).Return(expectedErr)
 	var expectedNewPlayer domain.Player
 
 	// Act

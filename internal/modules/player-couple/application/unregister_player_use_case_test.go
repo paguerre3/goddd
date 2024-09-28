@@ -12,9 +12,8 @@ import (
 func TestUnregisterPlayerUseCase(t *testing.T) {
 	t.Run("Valid player ID found unregistered successfully", func(t *testing.T) {
 		// Arrange
-		idGen := &MockIDGenerator{}
-		repo := &MockPlayerRepository{}
-		service := NewUnregisterPlayerUseCase(idGen, repo)
+		repo := &mockPlayerRepository{}
+		service := NewUnregisterPlayerUseCase(repo)
 		playerId := "valid-id"
 		foundPlayer := domain.Player{ID: playerId}
 		repo.On("FindByID", playerId).Return(foundPlayer, nil)
@@ -30,9 +29,8 @@ func TestUnregisterPlayerUseCase(t *testing.T) {
 
 	t.Run("Invalid player ID", func(t *testing.T) {
 		// Arrange
-		idGen := &MockIDGenerator{}
-		repo := &MockPlayerRepository{}
-		service := NewUnregisterPlayerUseCase(idGen, repo)
+		repo := &mockPlayerRepository{}
+		service := NewUnregisterPlayerUseCase(repo)
 		playerId := "i"
 		expectedErr := domain.ValidateID(playerId)
 
@@ -47,9 +45,8 @@ func TestUnregisterPlayerUseCase(t *testing.T) {
 
 	t.Run("Player not found", func(t *testing.T) {
 		// Arrange
-		idGen := &MockIDGenerator{}
-		repo := &MockPlayerRepository{}
-		service := NewUnregisterPlayerUseCase(idGen, repo)
+		repo := &mockPlayerRepository{}
+		service := NewUnregisterPlayerUseCase(repo)
 		playerId := "not-found-id"
 		repo.On("FindByID", playerId).Return(domain.Player{}, nil)
 
@@ -63,9 +60,8 @@ func TestUnregisterPlayerUseCase(t *testing.T) {
 
 	t.Run("Error finding player by ID", func(t *testing.T) {
 		// Arrange
-		idGen := &MockIDGenerator{}
-		repo := &MockPlayerRepository{}
-		service := NewUnregisterPlayerUseCase(idGen, repo)
+		repo := &mockPlayerRepository{}
+		service := NewUnregisterPlayerUseCase(repo)
 		playerId := "error-id"
 		expectedErr := errors.New("error finding player")
 		repo.On("FindByID", playerId).Return(domain.Player{}, expectedErr)
@@ -81,9 +77,8 @@ func TestUnregisterPlayerUseCase(t *testing.T) {
 
 	t.Run("Error deleting player", func(t *testing.T) {
 		// Arrange
-		idGen := &MockIDGenerator{}
-		repo := &MockPlayerRepository{}
-		service := NewUnregisterPlayerUseCase(idGen, repo)
+		repo := &mockPlayerRepository{}
+		service := NewUnregisterPlayerUseCase(repo)
 		playerId := "delete-error-id"
 		foundPlayer := domain.Player{ID: playerId}
 		repo.On("FindByID", playerId).Return(foundPlayer, nil)

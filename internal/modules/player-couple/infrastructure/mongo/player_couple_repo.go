@@ -2,10 +2,12 @@ package mongo
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
 	common "github.com/paguerre3/goddd/internal/modules/common/mongo"
+	"github.com/paguerre3/goddd/internal/modules/common/utils"
 	"github.com/paguerre3/goddd/internal/modules/player-couple/domain"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -18,23 +20,40 @@ const (
 )
 
 type mongoPlayerRepository struct {
+	idGen      utils.IDGenerator
 	collection *mongo.Collection
 }
 
 type mongoPlayerCoupleRepository struct {
+	idGen      utils.IDGenerator
 	collection *mongo.Collection
 }
 
-func NewMongoPlayerRepository(client common.MongoClient) domain.PlayerRepository {
+func NewMongoPlayerRepository(idGen utils.IDGenerator, client common.MongoClient) domain.PlayerRepository {
 	collection := client.GetCollection(playersColName)
-	return &mongoPlayerRepository{collection: collection}
+	return &mongoPlayerRepository{
+		idGen:      idGen,
+		collection: collection,
+	}
 }
 
-func (r *mongoPlayerRepository) Save(player domain.Player) error {
+func (r *mongoPlayerRepository) Upsert(player *domain.Player) error {
+	if player == nil {
+		return errors.New("player is nil")
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
+	// DDD repository principle.
+	if len(player.ID) > 0 {
+		_, err := r.collection.UpdateOne(ctx, bson.M{"_id": player.ID}, bson.M{"$set": player})
+		return err
+	}
+	player.ID = r.idGen.GenerateID()
 	_, err := r.collection.InsertOne(ctx, player)
+	if err != nil {
+		player.ID = ""
+	}
 	return err
 }
 
@@ -90,14 +109,6 @@ func (r *mongoPlayerRepository) FindByLastName(lastName string) ([]domain.Player
 	return players, nil
 }
 
-func (r *mongoPlayerRepository) Update(player domain.Player) error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
-	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": player.ID}, bson.M{"$set": player})
-	return err
-}
-
 func (r *mongoPlayerRepository) Delete(id string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -106,16 +117,31 @@ func (r *mongoPlayerRepository) Delete(id string) error {
 	return err
 }
 
-func NewMongoPlayerCoupleRepository(client common.MongoClient) domain.PlayerCoupleRepository {
+func NewMongoPlayerCoupleRepository(idGen utils.IDGenerator, client common.MongoClient) domain.PlayerCoupleRepository {
 	collection := client.GetCollection(playerCouplesColName)
-	return &mongoPlayerCoupleRepository{collection: collection}
+	return &mongoPlayerCoupleRepository{
+		idGen:      idGen,
+		collection: collection,
+	}
 }
 
-func (r *mongoPlayerCoupleRepository) Save(playerCouple domain.PlayerCouple) error {
+func (r *mongoPlayerCoupleRepository) Upsert(playerCouple *domain.PlayerCouple) error {
+	if playerCouple == nil {
+		return errors.New("playerCouple is nil")
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
+	// DDD repository principle.
+	if len(playerCouple.ID) > 0 {
+		_, err := r.collection.UpdateOne(ctx, bson.M{"_id": playerCouple.ID}, bson.M{"$set": playerCouple})
+		return err
+	}
+	playerCouple.ID = r.idGen.GenerateIDWithPrefixes(playerCouple.Player1.LastName, playerCouple.Player2.LastName)
 	_, err := r.collection.InsertOne(ctx, playerCouple)
+	if err != nil {
+		playerCouple.ID = ""
+	}
 	return err
 }
 
@@ -153,14 +179,6 @@ func (r *mongoPlayerCoupleRepository) FindByPrefixes(lastNamePlayer1, lastNamePl
 		playerCouples = append(playerCouples, playerCouple)
 	}
 	return playerCouples, nil
-}
-
-func (r *mongoPlayerCoupleRepository) Update(playerCouple domain.PlayerCouple) error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
-	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": playerCouple.ID}, bson.M{"$set": playerCouple})
-	return err
 }
 
 func (r *mongoPlayerCoupleRepository) Delete(id string) error {

@@ -31,11 +31,8 @@ type PlayerCouple struct {
 	Ranking *int   `bson:"ranking,omitempty" json:"ranking,omitempty"`
 }
 
-func NewPlayer(idGen IDGenerator, email string, socialSecurityNumber *string,
+func NewPlayer(email string, socialSecurityNumber *string,
 	firstName, lastName string, age *int) (*Player, error) {
-	if idGen == nil {
-		return nil, fmt.Errorf("idGen cannot be nil")
-	}
 	if err := ValidateEmail(email); err != nil {
 		return nil, err
 	}
@@ -52,8 +49,7 @@ func NewPlayer(idGen IDGenerator, email string, socialSecurityNumber *string,
 		return nil, fmt.Errorf("invalid age: %d", *age)
 	}
 	return &Player{
-		// Use custom ID generator instead of the one provided by the underlying storage:
-		ID:                   idGen.GenerateID(),
+		//ID:                 auto generated ID set in the repository.
 		Email:                email,
 		SocialSecurityNumber: socialSecurityNumber,
 		FirstName:            firstName,
@@ -83,10 +79,7 @@ func ValidateLastName(lastName string) error {
 	return nil
 }
 
-func NewPlayerCouple(idGen IDGenerator, player1 Player, player2 Player, ranking *int) (*PlayerCouple, error) {
-	if idGen == nil {
-		return nil, fmt.Errorf("idGen cannot be nil")
-	}
+func NewPlayerCouple(player1 Player, player2 Player, ranking *int) (*PlayerCouple, error) {
 	if player1.ID == player2.ID {
 		return nil, fmt.Errorf("player1 and player2 cannot be the same")
 	}
@@ -94,8 +87,7 @@ func NewPlayerCouple(idGen IDGenerator, player1 Player, player2 Player, ranking 
 		return nil, fmt.Errorf("invalid ranking: %d", *ranking)
 	}
 	return &PlayerCouple{
-		// Use custom ID generator instead of the one provided by the underlying storage:
-		ID:      idGen.GenerateIDWithPrefixes(player1.LastName, player2.LastName),
+		//ID:    auto generated ID set in the repository.
 		Player1: player1,
 		Player2: player2,
 		Ranking: ranking,

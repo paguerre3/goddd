@@ -20,12 +20,8 @@ func (s UnregisterPlayerStatus) String() string {
 	return [...]string{"UnregisterPlayerPending", "UnregisterPlayerInvalid", "UnregisterPlayerNotFound", "UnregisterPlayerDeleted"}[s]
 }
 
-func NewUnregisterPlayerUseCase(idGenerator domain.IDGenerator,
-	playerRepository domain.PlayerRepository) UnregisterPlayerUseCase {
-	return &playerService{
-		idGen:      idGenerator,
-		playerRepo: playerRepository,
-	}
+func NewUnregisterPlayerUseCase(playerRepository domain.PlayerRepository) UnregisterPlayerUseCase {
+	return &playerService{playerRepo: playerRepository}
 }
 
 func (s *playerService) UnregisterPlayerUseCase(playerId string) (status UnregisterPlayerStatus, err error) {

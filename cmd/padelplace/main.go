@@ -15,11 +15,11 @@ func main() {
 
 	idGen := utils.NewUUIDGenerator()
 
-	playerRepo := player_couple_infrastructure.NewMongoPlayerRepository(mongoClient)
+	playerRepo := player_couple_infrastructure.NewMongoPlayerRepository(idGen, mongoClient)
 
-	registerPlayerUseCase := application.NewRegisterPlayerUseCase(idGen, playerRepo)
-	unregisterPlayerUseCase := application.NewUnregisterPlayerUseCase(idGen, playerRepo)
-	findPlayerUseCase := application.NewFindPlayerUseCase(idGen, playerRepo)
+	registerPlayerUseCase := application.NewRegisterPlayerUseCase(playerRepo)
+	unregisterPlayerUseCase := application.NewUnregisterPlayerUseCase(playerRepo)
+	findPlayerUseCase := application.NewFindPlayerUseCase(playerRepo)
 
 	playerHandler := api.NewPlayerHandler(registerPlayerUseCase, unregisterPlayerUseCase, findPlayerUseCase)
 
