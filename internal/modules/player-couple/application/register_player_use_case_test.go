@@ -68,7 +68,7 @@ func TestRegisterPlayerUseCase_Success(t *testing.T) {
 	// Arrange
 	idGen := &MockIDGenerator{}
 	repo := &MockPlayerRepository{}
-	service := NewRegisterPlayerUseCase(repo, idGen)
+	service := NewRegisterPlayerUseCase(idGen, repo)
 	inputPlayer := domain.Player{
 		FirstName: "John",
 		LastName:  "Doe",
@@ -98,7 +98,7 @@ func TestRegisterPlayerUseCase_UpdateExistingPlayerByID(t *testing.T) {
 	// Arrange
 	idGen := &MockIDGenerator{}
 	repo := &MockPlayerRepository{}
-	service := NewRegisterPlayerUseCase(repo, idGen)
+	service := NewRegisterPlayerUseCase(idGen, repo)
 	inputPlayer := domain.Player{
 		ID:        "existing-id",
 		FirstName: "John",
@@ -124,7 +124,7 @@ func TestRegisterPlayerUseCase_UpdateExistingPlayerByIDValidationError(t *testin
 	// Arrange
 	idGen := &MockIDGenerator{}
 	repo := &MockPlayerRepository{}
-	service := NewRegisterPlayerUseCase(repo, idGen)
+	service := NewRegisterPlayerUseCase(idGen, repo)
 	inputPlayer := domain.Player{
 		// Invalid ID
 		ID:        "i",
@@ -151,7 +151,7 @@ func TestRegisterPlayerUseCase_UpdateExistingPlayerByEmail(t *testing.T) {
 	// Arrange
 	idGen := &MockIDGenerator{}
 	repo := &MockPlayerRepository{}
-	service := NewRegisterPlayerUseCase(repo, idGen)
+	service := NewRegisterPlayerUseCase(idGen, repo)
 	inputPlayer := domain.Player{
 		FirstName: "John",
 		LastName:  "Doe",
@@ -181,7 +181,7 @@ func TestRegisterPlayerUseCase_ValidationError(t *testing.T) {
 	// Arrange
 	idGen := &MockIDGenerator{}
 	repo := &MockPlayerRepository{}
-	service := NewRegisterPlayerUseCase(repo, idGen)
+	service := NewRegisterPlayerUseCase(idGen, repo)
 	inputPlayer := domain.Player{Email: ""}
 
 	// Expect
@@ -203,7 +203,7 @@ func TestRegisterPlayerUseCase_FindByIDError(t *testing.T) {
 	// Arrange
 	idGen := &MockIDGenerator{}
 	repo := &MockPlayerRepository{}
-	service := NewRegisterPlayerUseCase(repo, idGen)
+	service := NewRegisterPlayerUseCase(idGen, repo)
 	inputPlayer := domain.Player{
 		ID:        "existing-id",
 		FirstName: "John",
@@ -230,7 +230,7 @@ func TestRegisterPlayerUseCase_FindByEmailError(t *testing.T) {
 	// Arrange
 	idGen := &MockIDGenerator{}
 	repo := &MockPlayerRepository{}
-	service := NewRegisterPlayerUseCase(repo, idGen)
+	service := NewRegisterPlayerUseCase(idGen, repo)
 	inputPlayer := domain.Player{
 		FirstName: "John",
 		LastName:  "Doe",
@@ -256,7 +256,7 @@ func TestRegisterPlayerUseCase_SaveError(t *testing.T) {
 	// Arrange
 	idGen := &MockIDGenerator{}
 	repo := &MockPlayerRepository{}
-	service := NewRegisterPlayerUseCase(repo, idGen)
+	service := NewRegisterPlayerUseCase(idGen, repo)
 	inputPlayer := domain.Player{
 		FirstName: "John",
 		LastName:  "Doe",
@@ -283,7 +283,7 @@ func TestPlayerUseCase_UpdateError(t *testing.T) {
 	// Arrange
 	idGen := &MockIDGenerator{}
 	repo := &MockPlayerRepository{}
-	service := NewRegisterPlayerUseCase(repo, idGen)
+	service := NewRegisterPlayerUseCase(idGen, repo)
 	inputPlayer := domain.Player{
 		ID:        "existing-id",
 		FirstName: "John",

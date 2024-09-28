@@ -20,11 +20,11 @@ func (s UnregisterPlayerStatus) String() string {
 	return [...]string{"UnregisterPlayerPending", "UnregisterPlayerInvalid", "UnregisterPlayerNotFound", "UnregisterPlayerDeleted"}[s]
 }
 
-func NewUnregisterPlayerUseCase(playerRepository domain.PlayerRepository,
-	idGenerator domain.IDGenerator) UnregisterPlayerUseCase {
+func NewUnregisterPlayerUseCase(idGenerator domain.IDGenerator,
+	playerRepository domain.PlayerRepository) UnregisterPlayerUseCase {
 	return &playerService{
-		playerRepo: playerRepository,
 		idGen:      idGenerator,
+		playerRepo: playerRepository,
 	}
 }
 

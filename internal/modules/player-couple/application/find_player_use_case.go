@@ -17,11 +17,11 @@ const (
 	FindPlayerFound
 )
 
-func NewFindPlayerUseCase(playerRepository domain.PlayerRepository,
-	idGenerator domain.IDGenerator) FindPlayerUseCase {
+func NewFindPlayerUseCase(idGenerator domain.IDGenerator,
+	playerRepository domain.PlayerRepository) FindPlayerUseCase {
 	return &playerService{
-		playerRepo: playerRepository,
 		idGen:      idGenerator,
+		playerRepo: playerRepository,
 	}
 }
 

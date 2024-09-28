@@ -17,9 +17,9 @@ func main() {
 
 	playerRepo := player_couple_infrastructure.NewMongoPlayerRepository(mongoClient)
 
-	registerPlayerUseCase := application.NewRegisterPlayerUseCase(playerRepo, idGen)
-	unregisterPlayerUseCase := application.NewUnregisterPlayerUseCase(playerRepo, idGen)
-	findPlayerUseCase := application.NewFindPlayerUseCase(playerRepo, idGen)
+	registerPlayerUseCase := application.NewRegisterPlayerUseCase(idGen, playerRepo)
+	unregisterPlayerUseCase := application.NewUnregisterPlayerUseCase(idGen, playerRepo)
+	findPlayerUseCase := application.NewFindPlayerUseCase(idGen, playerRepo)
 
 	playerHandler := api.NewPlayerHandler(registerPlayerUseCase, unregisterPlayerUseCase, findPlayerUseCase)
 

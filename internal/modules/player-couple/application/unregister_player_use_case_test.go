@@ -14,7 +14,7 @@ func TestUnregisterPlayerUseCase(t *testing.T) {
 		// Arrange
 		idGen := &MockIDGenerator{}
 		repo := &MockPlayerRepository{}
-		service := NewUnregisterPlayerUseCase(repo, idGen)
+		service := NewUnregisterPlayerUseCase(idGen, repo)
 		playerId := "valid-id"
 		foundPlayer := domain.Player{ID: playerId}
 		repo.On("FindByID", playerId).Return(foundPlayer, nil)
@@ -32,7 +32,7 @@ func TestUnregisterPlayerUseCase(t *testing.T) {
 		// Arrange
 		idGen := &MockIDGenerator{}
 		repo := &MockPlayerRepository{}
-		service := NewUnregisterPlayerUseCase(repo, idGen)
+		service := NewUnregisterPlayerUseCase(idGen, repo)
 		playerId := "i"
 		expectedErr := domain.ValidateID(playerId)
 
@@ -49,7 +49,7 @@ func TestUnregisterPlayerUseCase(t *testing.T) {
 		// Arrange
 		idGen := &MockIDGenerator{}
 		repo := &MockPlayerRepository{}
-		service := NewUnregisterPlayerUseCase(repo, idGen)
+		service := NewUnregisterPlayerUseCase(idGen, repo)
 		playerId := "not-found-id"
 		repo.On("FindByID", playerId).Return(domain.Player{}, nil)
 
@@ -65,7 +65,7 @@ func TestUnregisterPlayerUseCase(t *testing.T) {
 		// Arrange
 		idGen := &MockIDGenerator{}
 		repo := &MockPlayerRepository{}
-		service := NewUnregisterPlayerUseCase(repo, idGen)
+		service := NewUnregisterPlayerUseCase(idGen, repo)
 		playerId := "error-id"
 		expectedErr := errors.New("error finding player")
 		repo.On("FindByID", playerId).Return(domain.Player{}, expectedErr)
@@ -83,7 +83,7 @@ func TestUnregisterPlayerUseCase(t *testing.T) {
 		// Arrange
 		idGen := &MockIDGenerator{}
 		repo := &MockPlayerRepository{}
-		service := NewUnregisterPlayerUseCase(repo, idGen)
+		service := NewUnregisterPlayerUseCase(idGen, repo)
 		playerId := "delete-error-id"
 		foundPlayer := domain.Player{ID: playerId}
 		repo.On("FindByID", playerId).Return(foundPlayer, nil)

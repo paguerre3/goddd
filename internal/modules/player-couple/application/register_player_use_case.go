@@ -17,11 +17,11 @@ const (
 	RegisterPlayerCreated
 )
 
-func NewRegisterPlayerUseCase(playerRepository domain.PlayerRepository,
-	idGenerator domain.IDGenerator) RegisterPlayerUseCase {
+func NewRegisterPlayerUseCase(idGenerator domain.IDGenerator,
+	playerRepository domain.PlayerRepository) RegisterPlayerUseCase {
 	return &playerService{
-		playerRepo: playerRepository,
 		idGen:      idGenerator,
+		playerRepo: playerRepository,
 	}
 }
 
