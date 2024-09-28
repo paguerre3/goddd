@@ -8,6 +8,8 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: pass
+    volumes:
+      - mongo-data:/data/db
 
   mongo-express:
     image: mongo-express
@@ -33,3 +35,7 @@ services:
       - MONGO_ADDR=mongodb://root:pass@mongo_db:27017
     depends_on:
       - mongo_db
+
+volumes:
+  # volume name definition:
+  mongo-data:
