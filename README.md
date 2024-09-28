@@ -51,7 +51,7 @@ padel-tournament/
 ---
 ### Requirements
 1. ⚠️Docker must be running before executing Application.
-2. <code>docker-compose -f docker-compose.yml up -d</code> before running tests or application. 
+2. <code>docker-compose -f docker-compose.yml up -d</code> for running tests and application. 
 3. [Mongo Express URI](http://localhost:8081/)
 
 ***Optional***: Running under WSL needs allowing traffic through the firewall, i.e. 
