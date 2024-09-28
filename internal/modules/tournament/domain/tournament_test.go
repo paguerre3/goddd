@@ -8,17 +8,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// Mock IDGenerator for testing
-type MockIDGenerator struct{}
-
-func (m *MockIDGenerator) GenerateID() string {
-	return "mock-id"
-}
-
-func (m *MockIDGenerator) GenerateIDWithPrefixes(p1, p2 string) string {
-	// empty implementtaion as it isn't used inside tournament:
-	return ""
-}
+const (
+	mockId = "mock-id"
+)
 
 func TestTournament_MarshalJSON_Success(t *testing.T) {
 	tournament := Tournament{
@@ -49,44 +41,31 @@ func TestMatch_MarshalJSON_Success(t *testing.T) {
 }
 
 func TestNewTournament_Success(t *testing.T) {
-	idGen := &MockIDGenerator{}
 	timestamp := time.Now()
 	playerCouples := []PlayerCouple{}
 	rounds := []Round{}
 
-	tournament, err := NewTournament(idGen, "Grand Slam", timestamp, playerCouples, rounds)
+	tournament, err := NewTournament("Grand Slam", timestamp, playerCouples, rounds)
 	assert.NoError(t, err, "Expected no error when creating a valid Tournament")
 	assert.NotNil(t, tournament, "Expected Tournament to be non-nil")
 }
 
-func TestNewTournament_Fail_NilIDGenerator(t *testing.T) {
-	timestamp := time.Now()
-	playerCouples := []PlayerCouple{}
-	rounds := []Round{}
-
-	tournament, err := NewTournament(nil, "Grand Slam", timestamp, playerCouples, rounds)
-	assert.Error(t, err, "Expected error when idGen is nil")
-	assert.Nil(t, tournament, "Expected Tournament to be nil when idGen is nil")
-}
-
 func TestNewTournament_Fail_InvalidTitle(t *testing.T) {
-	idGen := &MockIDGenerator{}
 	timestamp := time.Now()
 	playerCouples := []PlayerCouple{}
 	rounds := []Round{}
 
-	tournament, err := NewTournament(idGen, "GS", timestamp, playerCouples, rounds)
+	tournament, err := NewTournament("GS", timestamp, playerCouples, rounds)
 	assert.Error(t, err, "Expected error when title is too short")
 	assert.Nil(t, tournament, "Expected Tournament to be nil when title is too short")
 }
 
 func TestNewTournament_Fail_OldTimestamp(t *testing.T) {
-	idGen := &MockIDGenerator{}
 	timestamp := time.Now().AddDate(0, 0, minMatchDays-1)
 	playerCouples := []PlayerCouple{}
 	rounds := []Round{}
 
-	tournament, err := NewTournament(idGen, "Grand Slam", timestamp, playerCouples, rounds)
+	tournament, err := NewTournament("Grand Slam", timestamp, playerCouples, rounds)
 	assert.Error(t, err, "Expected error when timestamp is older than allowed")
 	assert.Nil(t, tournament, "Expected Tournament to be nil when timestamp is older than allowed")
 }
@@ -108,48 +87,46 @@ func TestNewRound_Fail_InvalidRoundNumber(t *testing.T) {
 }
 
 func TestNewMatch_Success(t *testing.T) {
-	idGen := &MockIDGenerator{}
 	timestamp := time.Now()
-	couple1 := PlayerCouple{ID: "c1"}
-	couple2 := PlayerCouple{ID: "c2"}
+	couple1 := PlayerCouple{ID: "cp1"}
+	couple2 := PlayerCouple{ID: "cp2"}
 	score := &Score{}
 
-	match, err := NewMatch(idGen, timestamp, couple1, couple2, score)
+	match, err := NewMatch(mockId, timestamp, couple1, couple2, score)
 	assert.NoError(t, err, "Expected no error when creating a valid Match")
 	assert.NotNil(t, match, "Expected Match to be non-nil")
 }
 
-func TestNewMatch_Fail_NilIDGenerator(t *testing.T) {
+func TestNewMatch_Fail_InvalidID(t *testing.T) {
 	timestamp := time.Now()
-	couple1 := PlayerCouple{ID: "c1"}
-	couple2 := PlayerCouple{ID: "c2"}
+	couple1 := PlayerCouple{ID: "cp1"}
+	couple2 := PlayerCouple{ID: "cp2"}
 	score := &Score{}
 
-	match, err := NewMatch(nil, timestamp, couple1, couple2, score)
-	assert.Error(t, err, "Expected error when idGen is nil")
-	assert.Nil(t, match, "Expected Match to be nil when idGen is nil")
+	match, err := NewMatch("", timestamp, couple1, couple2, score)
+	assert.Error(t, err, "Expected error when ID is invalid")
+	assert.Equal(t, "invalid id: ", err.Error())
+	assert.Nil(t, match, "Expected Match to be nil when ID is invalid")
 }
 
 func TestNewMatch_Fail_OldTimestamp(t *testing.T) {
-	idGen := &MockIDGenerator{}
 	timestamp := time.Now().AddDate(0, 0, minMatchDays-1)
-	couple1 := PlayerCouple{ID: "c1"}
-	couple2 := PlayerCouple{ID: "c2"}
+	couple1 := PlayerCouple{ID: "cp1"}
+	couple2 := PlayerCouple{ID: "cp2"}
 	score := &Score{}
 
-	match, err := NewMatch(idGen, timestamp, couple1, couple2, score)
+	match, err := NewMatch(mockId, timestamp, couple1, couple2, score)
 	assert.Error(t, err, "Expected error when timestamp is older than allowed")
 	assert.Nil(t, match, "Expected Match to be nil when timestamp is older than allowed")
 }
 
 func TestNewMatch_Fail_SameCouples(t *testing.T) {
-	idGen := &MockIDGenerator{}
 	timestamp := time.Now()
 	couple1 := PlayerCouple{ID: "c1"}
 	couple2 := PlayerCouple{ID: "c1"}
 	score := &Score{}
 
-	match, err := NewMatch(idGen, timestamp, couple1, couple2, score)
+	match, err := NewMatch(mockId, timestamp, couple1, couple2, score)
 	assert.Error(t, err, "Expected error when couple1 and couple2 are the same")
 	assert.Nil(t, match, "Expected Match to be nil when couple1 and couple2 are the same")
 }

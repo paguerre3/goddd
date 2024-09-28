@@ -15,6 +15,7 @@ const (
 	minRoundNumber      = 0
 	noSecondsFormat     = "2006-01-02T15:04"
 	minTournamentDigits = 5
+	minIdDigits         = 3
 )
 
 type Tournament struct {
@@ -81,11 +82,8 @@ type Tiebreak struct {
 	PointsCouple2 int `bson:"pointsCouple2" json:"pointsCouple2"`
 }
 
-func NewTournament(idGen IDGenerator, title string, timestamp time.Time,
+func NewTournament(title string, timestamp time.Time,
 	playerCouples []PlayerCouple, rounds []Round) (*Tournament, error) {
-	if idGen == nil {
-		return nil, fmt.Errorf("idGen cannot be nil")
-	}
 	if len(title) < minTournamentDigits {
 		return nil, fmt.Errorf("invalid title: %s", title)
 	}
@@ -93,7 +91,7 @@ func NewTournament(idGen IDGenerator, title string, timestamp time.Time,
 		return nil, fmt.Errorf("timestamp cannot older than %d days", minMatchDays)
 	}
 	return &Tournament{
-		ID:            idGen.GenerateID(),
+		//ID:          auto generated ID set in the repository.
 		Title:         title,
 		Timestamp:     timestamp,
 		PlayerCouples: playerCouples,
@@ -102,6 +100,7 @@ func NewTournament(idGen IDGenerator, title string, timestamp time.Time,
 }
 
 func NewRound(roundNumber int, matches []Match) (*Round, error) {
+	// Round is an embedded struct inside a root aggregate that will be stored in the tournament repository.
 	if roundNumber < minRoundNumber {
 		return nil, fmt.Errorf("invalid roundNumber: %d", roundNumber)
 	}
@@ -111,9 +110,10 @@ func NewRound(roundNumber int, matches []Match) (*Round, error) {
 	}, nil
 }
 
-func NewMatch(idGen IDGenerator, timestamp time.Time, couple1, couple2 PlayerCouple, score *Score) (*Match, error) {
-	if idGen == nil {
-		return nil, fmt.Errorf("idGen cannot be nil")
+func NewMatch(id string, timestamp time.Time, couple1, couple2 PlayerCouple, score *Score) (*Match, error) {
+	// Match is an embedded struct inside a root aggregate that will be stored in the tournament repository.
+	if len(id) < minIdDigits {
+		return nil, fmt.Errorf("invalid id: %s", id)
 	}
 	if timestamp.Before(time.Now().AddDate(0, 0, minMatchDays)) {
 		return nil, fmt.Errorf("timestamp cannot older than %d days", minMatchDays)
@@ -122,7 +122,7 @@ func NewMatch(idGen IDGenerator, timestamp time.Time, couple1, couple2 PlayerCou
 		return nil, fmt.Errorf("couple1 and couple2 cannot be the same")
 	}
 	return &Match{
-		ID:        idGen.GenerateID(),
+		ID:        id,
 		Timestamp: timestamp,
 		Couple1:   couple1,
 		Couple2:   couple2,
