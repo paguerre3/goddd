@@ -43,7 +43,7 @@ func (r *mongoPlayerRepository) FindByID(id string) (domain.Player, error) {
 	defer cancel()
 
 	var player domain.Player
-	err := r.collection.FindOne(ctx, bson.M{"id": id}).Decode(&player)
+	err := r.collection.FindOne(ctx, bson.M{"_id": id}).Decode(&player)
 	if mongo.ErrNoDocuments == err {
 		return player, nil
 	}
@@ -66,8 +66,15 @@ func (r *mongoPlayerRepository) FindByLastName(lastName string) ([]domain.Player
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	// must be "all" lower case as mongo stores it in lower case, even if in the vew is showed in camel case:
-	cursor, err := r.collection.Find(ctx, bson.M{"lastname": lastName})
+	// Using only json must be "all" lower case as mongo stores it in lower case, even if in the vew is showed in camel case;
+	// but using bson then camel case is possible to use so enabling struct to support both is the right option,
+	// i.e. using json fopr ReST and bson for mongo.
+	//
+	// Conclusion:
+	// Using bson tags for MongoDB and json tags for HTTP APIs is a common and effective practice in Go applications.
+	// This approach allows you to take advantage of MongoDB’s capabilities while seamlessly interacting with HTTP clients using JSON.
+	// Just ensure you handle the conversion as needed between the two formats.
+	cursor, err := r.collection.Find(ctx, bson.M{"lastName": lastName})
 	if err != nil && mongo.ErrNoDocuments != err {
 		return nil, err
 	}
@@ -87,7 +94,7 @@ func (r *mongoPlayerRepository) Update(player domain.Player) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	_, err := r.collection.UpdateOne(ctx, bson.M{"id": player.ID}, bson.M{"$set": player})
+	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": player.ID}, bson.M{"$set": player})
 	return err
 }
 
@@ -95,7 +102,7 @@ func (r *mongoPlayerRepository) Delete(id string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	_, err := r.collection.DeleteOne(ctx, bson.M{"id": id})
+	_, err := r.collection.DeleteOne(ctx, bson.M{"_id": id})
 	return err
 }
 
@@ -117,7 +124,7 @@ func (r *mongoPlayerCoupleRepository) FindByID(id string) (domain.PlayerCouple, 
 	defer cancel()
 
 	var playerCouple domain.PlayerCouple
-	err := r.collection.FindOne(ctx, bson.M{"id": id}).Decode(&playerCouple)
+	err := r.collection.FindOne(ctx, bson.M{"_id": id}).Decode(&playerCouple)
 	if mongo.ErrNoDocuments == err {
 		return playerCouple, nil
 	}
@@ -130,7 +137,7 @@ func (r *mongoPlayerCoupleRepository) FindByPrefixes(lastNamePlayer1, lastNamePl
 
 	var prefix = fmt.Sprintf("%s-%s", lastNamePlayer1, lastNamePlayer2)
 	cursor, err := r.collection.Find(ctx, bson.M{
-		"id": bson.M{"$regex": "^" + prefix},
+		"_id": bson.M{"$regex": "^" + prefix},
 	})
 	if err != nil && mongo.ErrNoDocuments != err {
 		return nil, err
@@ -152,7 +159,7 @@ func (r *mongoPlayerCoupleRepository) Update(playerCouple domain.PlayerCouple) e
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	_, err := r.collection.UpdateOne(ctx, bson.M{"id": playerCouple.ID}, bson.M{"$set": playerCouple})
+	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": playerCouple.ID}, bson.M{"$set": playerCouple})
 	return err
 }
 
@@ -160,6 +167,6 @@ func (r *mongoPlayerCoupleRepository) Delete(id string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	_, err := r.collection.DeleteOne(ctx, bson.M{"id": id})
+	_, err := r.collection.DeleteOne(ctx, bson.M{"_id": id})
 	return err
 }

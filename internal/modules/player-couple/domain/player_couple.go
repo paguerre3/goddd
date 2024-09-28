@@ -16,19 +16,19 @@ const (
 )
 
 type Player struct {
-	ID                   string  `json:"id"`
-	Email                string  `json:"email"`
-	SocialSecurityNumber *string `json:"socialSecurityNumber,omitempty"`
-	FirstName            string  `json:"firstName"`
-	LastName             string  `json:"lastName"`
-	Age                  *int    `json:"age,omitempty"`
+	ID                   string  `bson:"_id" json:"id"`
+	Email                string  `bson:"email" json:"email"`
+	SocialSecurityNumber *string `bson:"socialSecurityNumber,omitempty" json:"socialSecurityNumber,omitempty"`
+	FirstName            string  `bson:"firstName" json:"firstName"`
+	LastName             string  `bson:"lastName" json:"lastName"`
+	Age                  *int    `bson:"age,omitempty" json:"age,omitempty"`
 }
 
 type PlayerCouple struct {
-	ID      string `json:"id"`
-	Player1 Player `json:"player1"`
-	Player2 Player `json:"player2"`
-	Ranking *int   `json:"ranking,omitempty"`
+	ID      string `bson:"_id" json:"id"`
+	Player1 Player `bson:"player1" json:"player1"`
+	Player2 Player `bson:"player2" json:"player2"`
+	Ranking *int   `bson:"ranking,omitempty" json:"ranking,omitempty"`
 }
 
 func NewPlayer(idGen IDGenerator, email string, socialSecurityNumber *string,
@@ -52,6 +52,7 @@ func NewPlayer(idGen IDGenerator, email string, socialSecurityNumber *string,
 		return nil, fmt.Errorf("invalid age: %d", *age)
 	}
 	return &Player{
+		// Use custom ID generator instead of the one provided by the underlying storage:
 		ID:                   idGen.GenerateID(),
 		Email:                email,
 		SocialSecurityNumber: socialSecurityNumber,
@@ -93,6 +94,7 @@ func NewPlayerCouple(idGen IDGenerator, player1 Player, player2 Player, ranking 
 		return nil, fmt.Errorf("invalid ranking: %d", *ranking)
 	}
 	return &PlayerCouple{
+		// Use custom ID generator instead of the one provided by the underlying storage:
 		ID:      idGen.GenerateIDWithPrefixes(player1.LastName, player2.LastName),
 		Player1: player1,
 		Player2: player2,

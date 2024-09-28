@@ -18,13 +18,13 @@ const (
 )
 
 type Tournament struct {
-	ID        string    `json:"id"`
-	Title     string    `json:"title"`
-	Timestamp time.Time `json:"timestamp"`
+	ID        string    `bson:"_id" json:"id"`
+	Title     string    `bson:"title" json:"title"`
+	Timestamp time.Time `bson:"timestamp" json:"timestamp"`
 	// Pre-requisite: Players creation is done in player-couple module.
 	// Tournament registration is done here:
-	PlayerCouples []PlayerCouple `json:"player_couples,omitempty"`
-	Rounds        []Round        `json:"rounds,omitempty"`
+	PlayerCouples []PlayerCouple `bson:"player_couples,omitempty" json:"player_couples,omitempty"`
+	Rounds        []Round        `bson:"rounds,omitempty" json:"rounds,omitempty"`
 }
 
 // Custom JSON marshalling to format time without seconds:
@@ -40,16 +40,16 @@ func (t Tournament) MarshalJSON() ([]byte, error) {
 }
 
 type Round struct {
-	Number  int     `json:"number"`
-	Matches []Match `json:"matches"`
+	Number  int     `bson:"number" json:"number"`
+	Matches []Match `bson:"matches" json:"matches"`
 }
 
 type Match struct {
-	ID        string       `json:"id"`
-	Timestamp time.Time    `json:"timestamp"`
-	Couple1   PlayerCouple `json:"couple1"`
-	Couple2   PlayerCouple `json:"couple2"`
-	Score     *Score       `json:"score,omitempty"`
+	ID        string       `bson:"_id" json:"id"`
+	Timestamp time.Time    `bson:"timestamp" json:"timestamp"`
+	Couple1   PlayerCouple `bson:"couple1" json:"couple1"`
+	Couple2   PlayerCouple `bson:"couple2" json:"couple2"`
+	Score     *Score       `bson:"score,omitempty" json:"score,omitempty"`
 }
 
 // Custom JSON marshalling to format time without seconds:
@@ -65,20 +65,20 @@ func (m Match) MarshalJSON() ([]byte, error) {
 }
 
 type Score struct {
-	Set1 GameSet  `json:"set1"`
-	Set2 GameSet  `json:"set2"`
-	Set3 *GameSet `json:"set3,omitempty"`
+	Set1 GameSet  `bson:"set1" json:"set1"`
+	Set2 GameSet  `bson:"set2" json:"set2"`
+	Set3 *GameSet `bson:"set3,omitempty" json:"set3,omitempty"`
 }
 
 type GameSet struct {
-	GamesCouple1 int       `json:"gamesCouple1"`
-	GamesCouple2 int       `json:"gamesCouple2"`
-	Tiebreak     *Tiebreak `json:"tiebreak,omitempty"`
+	GamesCouple1 int       `bson:"gamesCouple1" json:"gamesCouple1"`
+	GamesCouple2 int       `bson:"gamesCouple2" json:"gamesCouple2"`
+	Tiebreak     *Tiebreak `bson:"tiebreak,omitempty" json:"tiebreak,omitempty"`
 }
 
 type Tiebreak struct {
-	PointsCouple1 int `json:"pointsCouple1"`
-	PointsCouple2 int `json:"pointsCouple2"`
+	PointsCouple1 int `bson:"pointsCouple1" json:"pointsCouple1"`
+	PointsCouple2 int `bson:"pointsCouple2" json:"pointsCouple2"`
 }
 
 func NewTournament(idGen IDGenerator, title string, timestamp time.Time,
