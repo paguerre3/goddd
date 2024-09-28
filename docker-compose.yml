@@ -23,6 +23,7 @@ services:
       - mongo_db
 
   padel-place:
+    restart: "on-failure:5"
     build:
       context: .
       dockerfile: Dockerfile
