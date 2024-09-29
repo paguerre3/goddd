@@ -1,0 +1,46 @@
+Steps to Install Minikube on Ubuntu (WSL):
+Prerequisites:
+--------------
+0. Ensure Docker is running in your Ubuntu environment with proper permissions 
+(which is it explained in step "0_docker-install-in-wsl.txt", i.e.:
+    sudo service docker start
+    sudo usermod -aG docker $USER
+)
+
+
+
+2. You'll also need to install kubectl to manage your Kubernetes cluster:
+# sudo apt-get update
+# sudo apt-get upgrade -y
+# sudo apt-get install -y apt-transport-https ca-certificates curl
+
+# donwload kubectl manually
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+# add execution privileges 
+chmod +x kubectl
+
+# move kubectl to /usr/local/bin
+sudo mv kubectl /usr/local/bin/
+
+# check kubectl version
+kubectl version --client
+
+
+
+Install Minikube:
+-----------------
+1. Download and install minikube
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+
+2. Start Minikube with Docker as the Driver (wait few minutes until it's ready)
+minikube start --driver=docker
+
+3. Verify minikube status
+minikube status
+
+4. Then, confirm that kubectl is working by listing the Kubernetes nodes:
+kubectl get nodes
+
+

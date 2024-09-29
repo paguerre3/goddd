@@ -1,0 +1,113 @@
+https://www.youtube.com/watch?v=cv7Iyohhmo4:
+Instalar los paquetes necesarios
+
+sudo apt update
+
+sudo apt install --no-install-recommends apt-transport-https ca-certificates curl gnupg2
+
+Configurar el repositorio para instalar docker
+
+source /etc/os-release
+
+curl -fsSL https://download.docker.com/linux/${ID}/gpg | sudo apt-key add -
+
+echo "deb [arch=amd64] https://download.docker.com/linux/${ID} ${VERSION_CODENAME} stable" | sudo tee /etc/apt/sources.list.d/docker.list
+
+sudo apt update
+
+Instalar Docker
+
+sudo apt install docker-ce docker-ce-cli containerd.io
+("systemctl status docker" ==> is running, para continuar es necesario hacer "sudo systemctl stop docker")
+
+Agregar nuestro usuario al grupo Docker
+
+sudo usermod -aG docker $USER
+
+Configurar Dockerd
+
+DOCKER_DIR=/mnt/wsl/shared-docker
+
+mkdir -pm o=,ug=rwx "$DOCKER_DIR"
+
+sudo chgrp docker "$DOCKER_DIR"
+
+sudo mkdir /etc/docker
+
+sudo vim /etc/docker/daemon.json{"hosts": ["unix:///mnt/wsl/shared-docker/docker.sock"]}
+(sudo dockerd para checkear que todo esta en orden ==> API listen on /mnt/wsl/shared-docker/docker.sock)
+
+Programar el inicio automático de Docker al iniciar WSL
+
+Si usan zsh editen el archivo .zshrc en su home
+
+Si usan bash editen el archivo .bashrc en su home (ejemplo base: https://github.com/bowmanjd/docker-wsl/blob/main/docker-service.sh)
+
+DOCKER_DISTRO="Ubuntu" 
+(wsl -l -q ==> "Unbuntu" entonces es necesario actualizar la variabla asi)
+
+DOCKER_DIR=/mnt/wsl/shared-docker
+
+DOCKER_SOCK="$DOCKER_DIR/docker.sock"
+
+export DOCKER_HOST="unix://$DOCKER_SOCK"
+
+if [ ! -S "$DOCKER_SOCK" ]; then
+
+ mkdir -pm o=,ug=rwx "$DOCKER_DIR"
+
+ sudo chgrp docker "$DOCKER_DIR"
+ 
+ /mnt/c/Windows/System32/wsl.exe -d $DOCKER_DISTRO sh -c "nohup sudo -b dockerd < /dev/null > $DOCKER_DIR/dockerd.log 2>&1"
+
+(/mnt/c/Windows/System32/wsl.exe -d $DOCKER_DISTRO sh -c "nohup sudo -b dockerd < /dev/null > $DOCKER_DIR/dockerd.log 2>&1")
+
+fi
+
+Agregar nuestro usuario en sudoers
+
+sudo visudo
+%docker ALL=(ALL) NOPASSWD: /usr/bin/dockerd
+pdaguerr ALL=(ALL) NOPASSWD: /usr/bin/dockerd
+pdaguerr ALL=(ALL) NOPASSWD: /usr/bin/chgrp
+
+al final hacer exit y "wsl shutdown" para asegurar que la instancia se cerro!
+
+
+DOCKER COMPOSE TOOL that isn't a daemon and runs on top of Docker:
+-------------------
+1. Install Docker Compose
+Download Docker Compose
+
+First, download the latest version of Docker Compose. Replace <version> with the version you want to install. You can check the latest version here.
+
+bash
+Copy code
+VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep 'tag_name' | cut -d\" -f4)
+sudo curl -L "https://github.com/docker/compose/releases/download/$VERSION/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+Apply Executable Permissions
+
+Make the Docker Compose binary executable:
+
+bash
+Copy code
+sudo chmod +x /usr/local/bin/docker-compose
+
+Verify Installation
+Check the installed version to confirm it was installed correctly:
+
+bash
+Copy code
+docker-compose --version
+2. Configure Docker to Use Docker Compose
+Since you have Docker installed, Docker Compose should be ready to use. Docker Compose allows you to define and run multi-container Docker applications.
+
+If you face any issues with permissions or paths, ensure Docker is properly configured to be accessible within your WSL instance.
+
+3. Using Docker Compose
+You can now use Docker Compose to define services in a docker-compose.yml file and manage them with commands like:
+
+docker-compose up - Start up your services.
+docker-compose down - Stop and remove containers.
+docker-compose logs - View logs from your services.
+For more details on using Docker Compose, refer to the official Docker Compose documentation.
