@@ -34,7 +34,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: mongodb-secret
-              key: MONGO_ADDR
+              key: MONGO_ADDR_V1
         resources:
           requests:
             cpu: 100m

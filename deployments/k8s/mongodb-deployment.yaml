@@ -25,6 +25,13 @@ spec:
         image: mongo
         # it matches with Service targetPort
         ports:
+        # Port that the container listens on (it matches with Service targetPort)
+        # Defines the port where the containerized application inside the pod will listen for "incoming" traffic (It is not accessible directly outside the pod unless it's exposed via a Service)
+        # Kubernetes will use this information for proper network configurations (like when setting up services or network policies).
+        # You can specify multiple containerPort values if your containerized application listens on different ports, for example, one for HTTP and another for metrics.
+        # e.g. 
+        # - containerPort: 8080  # HTTP traffic
+        # - containerPort: 9090  # Metrics
         - containerPort: 27017
         # environmnt variables section.
         # user and password shouldn't be expossed directly in yamel,
