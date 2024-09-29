@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: padel-place-ingress
-  #namespace: padel-place
+  namespace: goddd
 spec:
   # routing rules forward requests from Host to InternalService
   rules:

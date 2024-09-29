@@ -4,6 +4,7 @@ kind: Deployment
 metadata:
   # deployment name
   name: mongodb-deployment
+  namespace: goddd
   # service selector matches with depl. label
   labels:
     app: mongodb
@@ -51,6 +52,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mongodb-service
+  namespace: goddd
 spec:
   selector:
     # service selector matches with deployment label
