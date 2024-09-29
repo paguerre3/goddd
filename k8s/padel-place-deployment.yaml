@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: padel-place-deployment
+  labels:
+    # service selector matches with depl. label
+    app: padel-place
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      # depl. selector label matches with template/pod label
+      app: padel-place
+  template:
+    metadata:
+      labels:
+        app: padel-place
+    spec:
+      containers:
+      - name: padel-place
+        image: <your-padel-place-image>
+        ports:
+        # Port that the container listens on (it matches with Service targetPort)
+        # Defines the port where the containerized application inside the pod will listen for "incoming" traffic (It is not accessible directly outside the pod unless it's exposed via a Service)
+        # Kubernetes will use this information for proper network configurations (like when setting up services or network policies).
+        # You can specify multiple containerPort values if your containerized application listens on different ports, for example, one for HTTP and another for metrics.
+        # e.g. 
+        # - containerPort: 8080  # HTTP traffic
+        # - containerPort: 9090  # Metrics
+        - containerPort: 8080
+        env:
+        - name: MONGO_ADDR
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: MONGO_ADDR
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: padel-place-service
+spec:
+  selector:
+    # service selector matches with deployment label
+    app: padel-place
+  ports:
+  - protocol: TCP
+    # Port on the Service (The port exposed by the Service to the client -external/internal)
+    port: 8080
+    # Port inside the pod (The port on the pod that the service forwards traffic to -pod-level) 
+    targetPort: 8080
+  type: LoadBalancer

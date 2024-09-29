@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+# k8s config file type
+kind: Deployment
+metadata:
+  # deployment name
+  name: mongodb-deployment
+  # service selector matches with depl. label
+  labels:
+    app: mongodb
+spec:
+  replicas: 1
+  selector:
+    # depl. selector label matches with template/pod label 
+    matchLabels:
+      app: mongodb
+  # blue print of the Pod
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo
+        # it matches with Service targetPort
+        ports:
+        - containerPort: 27017
+        # environmnt variables section.
+        # user and password shouldn't be expossed directly in yamel,
+        # so a Secret is created 1st to reference
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: MONGO_INITDB_ROOT_USERNAME
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: MONGO_INITDB_ROOT_PASSWORD
+      resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-service
+spec:
+  selector:
+    # service selector matches with deployment label
+    app: mongodb
+  # port is the exposed port used for receiving request from other service/pods
+  # targetPort is the one that matches with pod/containerPort.
+  # nodePort is the one used in the "external" IP but it only has a "valid range" of assignment, i.e. 30000-32767 
+  ports:
+  - protocol: TCP
+    # Port on the Service (The port exposed by the Service to the client -external/internal)
+    port: 27017
+    # Port inside the pod (The port on the pod that the service forwards traffic to -pod-level)
+    targetPort: 27017
+  # ClusterIP means that the Service is only accessible internally within the cluster, and it will not be exposed to the external network unless you specify another type, such as NodePort, LoadBalancer, or ExternalName.
+  type: ClusterIP
