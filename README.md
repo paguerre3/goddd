@@ -81,17 +81,16 @@ padel-tournament/
     ```bash
     kubectl apply -f ./deployments/k8s/mongo-express-deployment.yaml --namespace=goddd
     ```
-    *⚠️ Only for Minikube*: It shows "pending" EXTERNAL IP because of the usage of Minikube (using k8s directly should display external IP right away). Is needed to additionally execute "manually" <code>minikube service mongo-express-service</code> so Minikube assigns the external IP to the ExternalService of mongoexpress already defined, 
-    e.g. using docker driver and tunneling
-    ```bash	
-    minikube service mongo-express-service --namespace=goddd
-    ```
-    V. [Mongo Express URI (port range from 30000 -it will be assigned by Minikube)](http://127.0.0.1:30000/)
-
-    VI. Padel-place deployment & ingress
+    V. Padel-place deployment & ingress
     ```bash
     kubectl apply -f ./deployments/k8s/padel-place-*.yaml --namespace=goddd
     ```
+4. [Mongo Express URI (port range from 30000 -it will be assigned by Minikube)](http://127.0.0.1:30000/)
+*⚠️ Only for Minikube*: It shows "pending" EXTERNAL IP because of the usage of Minikube (using k8s directly should display external IP right away). Is needed to additionally execute "manually" <code>minikube service mongo-express-service</code> so Minikube assigns the external IP to the ExternalService of mongoexpress already defined, 
+e.g. using docker driver and tunneling
+```bash	
+minikube service mongo-express-service --namespace=goddd
+```    
 
 ***Optional***: Running under WSL needs allowing traffic through the firewall, i.e. 
 using PS <code>New-NetFirewallRule -DisplayName "Allow MongoDB" -Direction Inbound -LocalPort 27017 -Protocol TCP -Action Allow</code>
