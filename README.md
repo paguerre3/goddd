@@ -85,7 +85,7 @@ padel-tournament/
     ```bash
     kubectl apply -f ./deployments/k8s/padel-place-*.yaml --namespace=goddd
     ```
-4. *⚠️ Only for Minikube*: It shows "pending" EXTERNAL IP because of the usage of Minikube (using k8s directly should display external IP right away). Is needed to additionally execute "manually" <code>minikube service mongo-express-service</code> so Minikube assigns the external IP to the ExternalService of mongoexpress already defined, 
+4. ***⚠️ Only for Minikube***: It shows "pending" EXTERNAL IP because of the usage of Minikube (using k8s directly should display external IP right away). Is needed to additionally execute "manually" <code>minikube service mongo-express-service</code> so Minikube assigns the external IP to the ExternalService of mongoexpress already defined, 
 e.g. using docker driver and tunneling
     ```bash	
     minikube service mongo-express-service --namespace=goddd
