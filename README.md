@@ -66,19 +66,19 @@ padel-tournament/
 3. K8s deployment, i.e. <code>kubectl apply</code> *in order*:
 Namespace 1st, then deployments
 ```bash
-kubectl apply -f ./deployments/goddd-namespace.yaml
+kubectl apply -f ./deployments/k8s/goddd-namespace.yaml
 ```
 Mongodb deployment
 ```bash
-kubectl apply -f ./deployments/mongodb-secret.yaml ./deployments/mongodb-deployment.yaml
+kubectl apply -f ./deployments/k8s/mongodb-secret.yaml ./deployments/mongodb-deployment.yaml
 ```
 Mongo-express deployment
 ```bash
-kubectl apply -f ./deployments/mongo-express-deployment.yaml
+kubectl apply -f ./deployments/k8s/mongo-express-deployment.yaml
 ```
 Padel-place deployment and ingress
 ```bash
-kubectl apply -f ./deployments/padel-place-*.yaml
+kubectl apply -f ./deployments/k8s/padel-place-*.yaml
 ```
 4. [Mongo Express URI](http://localhost:8081/)
 
