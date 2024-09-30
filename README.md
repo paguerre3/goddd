@@ -64,33 +64,34 @@ padel-tournament/
 1. [Kubectl and Minikube install](docs/1_minikube-install.txt)
 2. [Build Docker image and publish it to Dockerhub *(Already done)*](docs/2_build_docker_image_and_publish_it.txt)
 3. K8s deployment, i.e. <code>kubectl apply</code> *in order*:
-I. Namespace 1st, then deployments
-```bash
-kubectl apply -f ./deployments/k8s/goddd-namespace.yaml
-```
-II. Create Secret for the Namespace
-```bash
-kubectl apply -f ./deployments/k8s/mongodb-secret.yaml --namespace=goddd
-```
-III. Mongodb deployment
-```bash
-kubectl apply -f ./deployments/k8s/mongodb-deployment.yaml --namespace=goddd
-```
-IV. Mongo-express deployment
-```bash
-kubectl apply -f ./deployments/k8s/mongo-express-deployment.yaml --namespace=goddd
-```
-*⚠️ Only for Minikube*: It shows "pending" EXTERNAL IP because of the usage of Minikube (using k8s directly should display external IP right away). Is needed to additionally execute "manually" <code>minikube service mongo-express-service</code> so Minikube assigns the external IP to the ExternalService of mongoexpress already defined, 
-e.g. using docker driver and tunneling
-```bash	
-minikube service mongo-express-service --namespace=goddd
-```
-V. [Mongo Express URI (port range from: 30000)](http://127.0.0.1:from30000/)
 
-VI. Padel-place deployment & ingress
-```bash
-kubectl apply -f ./deployments/k8s/padel-place-*.yaml --namespace=goddd
-```
+    I. Namespace 1st, then deployments
+    ```bash
+    kubectl apply -f ./deployments/k8s/goddd-namespace.yaml
+    ```
+    II. Create Secret for the Namespace
+    ```bash
+    kubectl apply -f ./deployments/k8s/mongodb-secret.yaml --namespace=goddd
+    ```
+    III. Mongodb deployment
+    ```bash
+    kubectl apply -f ./deployments/k8s/mongodb-deployment.yaml --namespace=goddd
+    ```
+    IV. Mongo-express deployment
+    ```bash
+    kubectl apply -f ./deployments/k8s/mongo-express-deployment.yaml --namespace=goddd
+    ```
+    *⚠️ Only for Minikube*: It shows "pending" EXTERNAL IP because of the usage of Minikube (using k8s directly should display external IP right away). Is needed to additionally execute "manually" <code>minikube service mongo-express-service</code> so Minikube assigns the external IP to the ExternalService of mongoexpress already defined, 
+    e.g. using docker driver and tunneling
+    ```bash	
+    minikube service mongo-express-service --namespace=goddd
+    ```
+    V. [Mongo Express URI (port range from: 30000)](http://127.0.0.1:from30000/)
+
+    VI. Padel-place deployment & ingress
+    ```bash
+    kubectl apply -f ./deployments/k8s/padel-place-*.yaml --namespace=goddd
+    ```
 
 ***Optional***: Running under WSL needs allowing traffic through the firewall, i.e. 
 using PS <code>New-NetFirewallRule -DisplayName "Allow MongoDB" -Direction Inbound -LocalPort 27017 -Protocol TCP -Action Allow</code>
