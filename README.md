@@ -68,15 +68,19 @@ Namespace 1st, then deployments
 ```bash
 kubectl apply -f ./deployments/k8s/goddd-namespace.yaml
 ```
+Create Secret for the Namespace
+```bash
+kubectl create secret generic mongodb-secret --from-file=./deployments/k8s/mongodb-secret.yaml
+```
 Mongodb deployment
 ```bash
-kubectl apply -f ./deployments/k8s/mongodb-secret.yaml ./deployments/k8s/mongodb-deployment.yaml
+kubectl apply -f ./deployments/k8s/mongodb-deployment.yaml
 ```
 Mongo-express deployment
 ```bash
 kubectl apply -f ./deployments/k8s/mongo-express-deployment.yaml
 ```
-Padel-place deployment and ingress
+Padel-place deployment & ingress
 ```bash
 kubectl apply -f ./deployments/k8s/padel-place-*.yaml
 ```
