@@ -176,7 +176,7 @@ e.g. using docker driver and tunneling
 
     **5.6.** Repeat steps 5.3 to 5.5 for "padel-place.com" using/applying [padel-place-ingress.yaml](/deployments/k8s/padel-place-ingress.yaml)
     ```bash
-    kubectl apply -f ./deployments/k8s/padel-place-ingress.yaml
+    kubectl apply -f ./deployments/k8s/padel-place-ingress.yaml --namespace=goddd
     ```
     ```bash
     kubectl get ingress -n goddd
