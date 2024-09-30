@@ -170,7 +170,7 @@ e.g. using docker driver and tunneling
     ```
     Check Ingress rule creation
     ```bash
-     kubectl get ingress -n kubernetes-dashboard
+    kubectl get ingress -n kubernetes-dashboard
     NAME                CLASS    HOSTS           ADDRESS        PORTS   AGE
     dashboard-ingress   none     dashboard.com   192.168.49.2   80      3m7s
     ```
@@ -181,6 +181,15 @@ e.g. using docker driver and tunneling
     **5.5.** Open browser, write domain "dashboard.com" and check k8s dashboard.
 
     **5.6.** Repeat steps 5.3 to 5.5 for "padel-place.com" using/applying [padel-place-ingress.yaml](/deployments/k8s/padel-place-ingress.yaml)
+    ```bash
+    kubectl apply -f ./deployments/k8s/padel-place-ingress.yaml
+    ```
+    ```bash
+    kubectl get ingress -n goddd
+    ```
+    ```bash
+    kubectl get ingress -n goddd
+    ```
 
 ***Optional***: Running under WSL needs allowing traffic through the firewall, i.e. 
 using PS <code>New-NetFirewallRule -DisplayName "Allow MongoDB" -Direction Inbound -LocalPort 27017 -Protocol TCP -Action Allow</code>
