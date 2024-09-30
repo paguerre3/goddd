@@ -87,7 +87,7 @@ minikube service mongo-express-service --namespace=godd
 ```
 Padel-place deployment & ingress
 ```bash
-kubectl apply -f ./deployments/k8s/padel-place-*.yaml
+kubectl apply -f ./deployments/k8s/padel-place-*.yaml --namespace=goddd
 ```
 4. [Mongo Express URI](http://localhost:8081/)
 
