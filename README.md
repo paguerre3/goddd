@@ -70,7 +70,7 @@ kubectl apply -f ./deployments/k8s/goddd-namespace.yaml
 ```
 Create Secret for the Namespace
 ```bash
-kubectl create secret generic mongodb-secret --from-file=./deployments/k8s/mongodb-secret.yaml
+kubectl create secret generic mongodb-secret --from-file=./deployments/k8s/mongodb-secret.yaml --namespace=goddd
 ```
 Mongodb deployment
 ```bash
