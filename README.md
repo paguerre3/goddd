@@ -70,7 +70,7 @@ kubectl apply -f ./deployments/k8s/goddd-namespace.yaml
 ```
 Mongodb deployment
 ```bash
-kubectl apply -f ./deployments/k8s/mongodb-secret.yaml ./deployments/mongodb-deployment.yaml
+kubectl apply -f ./deployments/k8s/mongodb-secret.yaml ./deployments/k8s/mongodb-deployment.yaml
 ```
 Mongo-express deployment
 ```bash
