@@ -19,5 +19,6 @@ spec:
           service:
             name: padel-place-service
             port:
+              # port of Ingress matches with InternalService port and not targetPort/node nor nodePort/exernalIP (when LoadBalancer type of ExternalService).
               number: 8080
         

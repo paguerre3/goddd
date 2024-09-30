@@ -81,16 +81,25 @@ padel-tournament/
     ```bash
     kubectl apply -f ./deployments/k8s/mongo-express-deployment.yaml --namespace=goddd
     ```
-    V. Padel-place deployment & ingress
+    V. Padel-place deployment & ingress *(check Pre-requisite)*
     ```bash
     kubectl apply -f ./deployments/k8s/padel-place-*.yaml --namespace=goddd
     ```
-4. ***⚠️ Only for Minikube***: It shows "pending" EXTERNAL IP because of the usage of Minikube (using k8s directly should display external IP right away). Is needed to additionally execute "manually" <code>minikube service mongo-express-service</code> so Minikube assigns the external IP to the ExternalService of mongoexpress already defined, 
+4. ***⚠️ Only for Minikube in case of Mongo-express external access)***: It shows "pending" EXTERNAL IP because of the usage of Minikube (using k8s directly should display external IP right away). Is needed to additionally execute "manually" <code>minikube service mongo-express-service</code> so Minikube assigns the external IP to the ExternalService of mongoexpress already defined, 
 e.g. using docker driver and tunneling
     ```bash	
     minikube service mongo-express-service --namespace=goddd
     ```    
     [Mongo Express URI (port range from 30000 -it will be assigned by Minikube)](http://127.0.0.1:30000/)
+
+5. ***⚠️ Only for Minikube in case of Padel-place  external access -Pre-requisite before applying [padle-place-ingress](deployments/k8s/padel-place-ingress.yaml)***: ´Ingress´´ is used in real production environments where having ´ExternalService´ for exposing "external" IP isn't adequate, i.e. normally an application is accessed setting its domain name and secured port through the client browser. ´Ingres´ configuration is of ´kind´: ´Ingress´, and then ´spec´ contains a section rules where "routing rules" have defined -host domain addresses that receive requests and forwards to ´http: paths: -backend: serviceName and servicePort´, i.e. Routing rules forward requests to ´InternalService/s´. In other words in ´Ingress´ its defined a mapping that forwards requests from ´Host´ to ´InternalService´. ⚠️*Warning, Ingress = ´spe: rules: http´ doesn't correspond to the "external communication protocol" that public URL uses, e.g. HTTPS or HTTP of my-domain, and instead it belongs to the "internal protocol" being used for forwarding the requests to ´InternalService´*. ´host´ present in routes of ´Ingress´ should be a valid domain address as it maps domain name to a Node's IP address which is considered the "entry point" OR, alternatively, host maps domain name to a server outside of k8s cluster that acts like a Proxy or Secured Gateway that behaves as "entry point", i.e. Ingress will receive request from the internal or external "entry point"/host and then it will forward to ´InternalService´.
+
+In order to work ´Ingress´ needs an "implementation" of it which is an ´IngressController´ Pod or set of Pods, i.e. ´IngressController´ runs on Pod or a Set of Pods of a Node in k8s cluster and does the "evaluation and processing" of ´Ingress rules´. In other words ´IngressController´ is the "entry point" of k8s cluster that evaluates all rules and manages redirections. There are many third-party implementations of ´IngressControllers´ and k8s also offers its own implementation which is **"Nginx"** ´IngressController´ therefore it needs to be installed so Ingress can function
+![Ingress Controller Implementation](https://github.com/paguerre3/kubeops/blob/master/support/22-ingress-controller.PNG)
+
+*if k8s cluster runs under a Cloud Service Provider like AWS or Google Cloud that have out-of-the-box kubernetes solutions or that use their own virtualized load balancer then there is normally a Cloud Provider "Load Balancer" placed in front of k8s cluster that behaves as a Secured Load Balancer "entry point" that receives and forwards requests to the ´IngresController´ of k8s, e.g.*
+![AWS Ingress Contrtoller Implementation](https://github.com/paguerre3/kubeops/blob/master/support/23-ingress-controller-cloud-provider.PNG)
+
 
 ***Optional***: Running under WSL needs allowing traffic through the firewall, i.e. 
 using PS <code>New-NetFirewallRule -DisplayName "Allow MongoDB" -Direction Inbound -LocalPort 27017 -Protocol TCP -Action Allow</code>
