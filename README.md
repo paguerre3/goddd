@@ -109,20 +109,13 @@ e.g. using docker driver and tunneling
     ```
     "At the end of all steps" enable tunneling if needed for testing purposes `minikube tunnel`.
     
-    Check Nginx `IngressController` is running under "kube-system" NS
+    Check Nginx `IngressController` is running under "ingress-nginx" NS
     ```bash
-    kubectl get pod -n kube-system
-    NAME                                        READY   STATUS      RESTARTS   AGE
-    coredns-74ff55c5b-67w9j                     1/1     Running     6          3d4h
-    etcd-minikube                               1/1     Running     6          3d4h
-    ingress-nginx-admission-create-dcxqv        0/1     Completed   0          12m
-    ingress-nginx-admission-patch-rk9kq         0/1     Completed   0          12m
-    ingress-nginx-controller-558664778f-dr57v   1/1     Running     0          12m
-    kube-apiserver-minikube                     1/1     Running     6          3d4h
-    kube-controller-manager-minikube            1/1     Running     6          3d4h
-    kube-proxy-xqrnr                            1/1     Running     6          3d4h
-    kube-scheduler-minikube                     1/1     Running     6          3d4h
-    storage-provisioner 
+    kubectl get pod -n ingress-nginx
+    NAME                                       READY   STATUS      RESTARTS   AGE
+    ingress-nginx-admission-create-k9vr6       0/1     Completed   0          5m55s
+    ingress-nginx-admission-patch-q8zwq        0/1     Completed   1          5m55s
+    ingress-nginx-controller-bc57996ff-ncnnn   1/1     Running     0          5m55s 
     ```    
     **5.2.** Enable k8s dashboard and metrics-server (dependency of dashboard) in Minikube to do a Demo of `Ingress` configuration, i.e. execute `minikube addons enable dashboard` and then `minikube addons enable metrics-server`. To check the list of Minikube enabled `addons minikube addons list`
     ```bash
@@ -176,7 +169,7 @@ e.g. using docker driver and tunneling
     ```
 
     **5.4.** Emulate "entry point" that behaves as a Proxy in front of `IngressController` outside k8s cluster so `IngressController` can use "dashboard" Ingress rule to evaluate and manage redirection (forwarding requests to "dashboard" `InternalService`), i.e. go to "hosts" file of os and create dns rule that matches with HOST and IP address of dashboard-ingress, e.g.
-    !(hosts dns update)[https://github.com/paguerre3/kubeops/blob/master/support/25-hosts-as-proxy.PNG]
+    ![hosts dns update](https://github.com/paguerre3/kubeops/blob/master/support/25-hosts-as-proxy.PNG)
 
     **5.5.** Open browser, write domain "dashboard.com" and check k8s dashboard.
 
