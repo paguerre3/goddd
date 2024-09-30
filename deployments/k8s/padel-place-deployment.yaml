@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: padel-place
-        image: <your-padel-place-image>
+        image: paguerre3/padelplace:latest
         ports:
         # Port that the container listens on (it matches with Service targetPort)
         # Defines the port where the containerized application inside the pod will listen for "incoming" traffic (It is not accessible directly outside the pod unless it's exposed via a Service)
