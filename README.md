@@ -64,19 +64,19 @@ padel-tournament/
 1. [Kubectl and Minikube install](docs/1_minikube-install.txt)
 2. [Build Docker image and publish it to Dockerhub *(Already done)*](docs/2_build_docker_image_and_publish_it.txt)
 3. K8s deployment, i.e. <code>kubectl apply</code> *in order*:
-Namespace 1st, then deployments
+I. Namespace 1st, then deployments
 ```bash
 kubectl apply -f ./deployments/k8s/goddd-namespace.yaml
 ```
-Create Secret for the Namespace
+II. Create Secret for the Namespace
 ```bash
 kubectl apply -f ./deployments/k8s/mongodb-secret.yaml --namespace=goddd
 ```
-Mongodb deployment
+III. Mongodb deployment
 ```bash
 kubectl apply -f ./deployments/k8s/mongodb-deployment.yaml --namespace=goddd
 ```
-Mongo-express deployment
+IV. Mongo-express deployment
 ```bash
 kubectl apply -f ./deployments/k8s/mongo-express-deployment.yaml --namespace=goddd
 ```
@@ -85,16 +85,16 @@ e.g. using docker driver and tunneling
 ```bash	
 minikube service mongo-express-service --namespace=goddd
 ```
-Padel-place deployment & ingress
+V. [Mongo Express URI (port range from: 30000)](http://127.0.0.1:from30000/)
+
+VI. Padel-place deployment & ingress
 ```bash
 kubectl apply -f ./deployments/k8s/padel-place-*.yaml --namespace=goddd
 ```
-4. [Mongo Express URI](http://localhost:8081/)
 
 ***Optional***: Running under WSL needs allowing traffic through the firewall, i.e. 
 using PS <code>New-NetFirewallRule -DisplayName "Allow MongoDB" -Direction Inbound -LocalPort 27017 -Protocol TCP -Action Allow</code>
 and <code>New-NetFirewallRule -DisplayName "Allow MongoExpress" -Direction Inbound -LocalPort 8081 -Protocol TCP -Action Allow</code>.  
-
 
 
 ---
