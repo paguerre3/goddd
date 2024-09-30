@@ -65,23 +65,23 @@ padel-tournament/
 2. [Build Docker image and publish it to Dockerhub *(Already done)*](docs/2_build_docker_image_and_publish_it.txt)
 3. K8s deployment, i.e. <code>kubectl apply</code> *in order*:
 
-    I. Namespace 1st, then deployments
+    **3.1.** Namespace 1st, then deployments
     ```bash
     kubectl apply -f ./deployments/k8s/goddd-namespace.yaml
     ```
-    II. Create Secret for the Namespace
+    **3.2.** Create Secret for the Namespace
     ```bash
     kubectl apply -f ./deployments/k8s/mongodb-secret.yaml --namespace=goddd
     ```
-    III. Mongodb deployment
+    **3.3.** Mongodb deployment
     ```bash
     kubectl apply -f ./deployments/k8s/mongodb-deployment.yaml --namespace=goddd
     ```
-    IV. Mongo-express deployment
+    **3.4.** Mongo-express deployment *(check **⚠️4**)*
     ```bash
     kubectl apply -f ./deployments/k8s/mongo-express-deployment.yaml --namespace=goddd
     ```
-    V. Padel-place deployment & ingress *(check Pre-requisite)*
+    **3.5.** Padel-place deployment & ingress *(check Pre-requisite **⚠️5**)*
     ```bash
     kubectl apply -f ./deployments/k8s/padel-place-*.yaml --namespace=goddd
     ```
@@ -100,6 +100,87 @@ e.g. using docker driver and tunneling
     *if k8s cluster runs under a Cloud Service Provider like AWS or Google Cloud that have out-of-the-box kubernetes solutions or that use their own virtualized load balancer then there is normally a Cloud Provider "Load Balancer" placed in front of k8s cluster that behaves as a Secured Load Balancer "entry point" that receives and forwards requests to the `IngresController` of k8s, e.g.*
     ![AWS Ingress Contrtoller Implementation](https://github.com/paguerre3/kubeops/blob/master/support/23-ingress-controller-cloud-provider.PNG)
 
+    **5.1.** Install `IngressController` in Minikube so `Ingress` can work, i.e. it automatically starts the Nginx implementation of `IngressController`
+    ```bash
+    minikube addons enable ingress
+    * After the addon is enabled, please run "minikube tunnel" and your ingress resources would be available at "127.0.0.1"
+    * Verifying ingress addon...
+    * The 'ingress' addon is enabled
+    ```
+    "At the end of all steps" enable tunneling if needed for testing purposes `minikube tunnel`.
+    
+    Check Nginx `IngressController` is running under "kube-system" NS
+    ```bash
+    kubectl get pod -n kube-system
+    NAME                                        READY   STATUS      RESTARTS   AGE
+    coredns-74ff55c5b-67w9j                     1/1     Running     6          3d4h
+    etcd-minikube                               1/1     Running     6          3d4h
+    ingress-nginx-admission-create-dcxqv        0/1     Completed   0          12m
+    ingress-nginx-admission-patch-rk9kq         0/1     Completed   0          12m
+    ingress-nginx-controller-558664778f-dr57v   1/1     Running     0          12m
+    kube-apiserver-minikube                     1/1     Running     6          3d4h
+    kube-controller-manager-minikube            1/1     Running     6          3d4h
+    kube-proxy-xqrnr                            1/1     Running     6          3d4h
+    kube-scheduler-minikube                     1/1     Running     6          3d4h
+    storage-provisioner 
+    ```    
+    **5.2.** Enable k8s dashboard and metrics-server (dependency of dashboard) in Minikube to do a Demo of `Ingress` configuration, i.e. execute `minikube addons enable dashboard` and then `minikube addons enable metrics-server`. To check the list of Minikube enabled `addons minikube addons list`
+    ```bash
+    minikube addons enable dashboard
+    ```
+    ```bash
+    minikube addons enable metrics-server
+    ```
+    ```bash
+    minikube addons list
+    ``` 
+    k8s dashboard has `InternalService` and Pod already configured but it doesn't have a `Ingress/IngressController` enabled.
+
+    Check NS in order to visualize the one associated to the dashboard
+    ```bash
+    kubectl get namespace
+    NAME                   STATUS   AGE
+    default                Active   3d5h
+    goddd                  Active   25h
+    kube-node-lease        Active   3d5h
+    kube-public            Active   3d5h
+    kube-system            Active   3d5h
+    kubernetes-dashboard   Active   23m	
+    ```	
+    Check configurations filtered by dashboard NS (`Ingress` "rule" configuration isn't present).
+    ```bash	
+    kubectl get all -n kubernetes-dashboard
+    NAME                                            READY   STATUS    RESTARTS   AGE
+    pod/dashboard-metrics-scraper-c95fcf479-kk692   1/1     Running   0          25m
+    pod/kubernetes-dashboard-6cff4c7c4f-9vpvg       1/1     Running   0          25m
+    NAME                                TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+    service/dashboard-metrics-scraper   ClusterIP   10.100.171.241   none          8000/TCP   25m
+    service/kubernetes-dashboard        ClusterIP   10.99.44.121     none          80/TCP     25m
+    NAME                                        READY   UP-TO-DATE   AVAILABLE   AGE
+    deployment.apps/dashboard-metrics-scraper   1/1     1            1           25m
+    deployment.apps/kubernetes-dashboard        1/1     1            1           25m
+    NAME                                                  DESIRED   CURRENT   READY   AGE
+    replicaset.apps/dashboard-metrics-scraper-c95fcf479   1         1         1       25m
+    replicaset.apps/kubernetes-dashboard-6cff4c7c4f       1         1         1       25m
+    ```
+
+    **5.3.** Create `Ingress` "rule" resource for k8s dashboard, i.e. [dashboard Ingress](deployments/k8s/dashboard-ingress.yaml) and execute
+    ```bash
+    kubectl apply -f ./deployments/k8s/dashboard-ingress.yaml
+    ```
+    Check Ingress rule creation
+    ```bash
+     kubectl get ingress -n kubernetes-dashboard
+    NAME                CLASS    HOSTS           ADDRESS        PORTS   AGE
+    dashboard-ingress   none     dashboard.com   192.168.49.2   80      3m7s
+    ```
+
+    **5.4.** Emulate "entry point" that behaves as a Proxy in front of `IngressController` outside k8s cluster so `IngressController` can use "dashboard" Ingress rule to evaluate and manage redirection (forwarding requests to "dashboard" `InternalService`), i.e. go to "hosts" file of os and create dns rule that matches with HOST and IP address of dashboard-ingress, e.g.
+    !(hosts dns update)[https://github.com/paguerre3/kubeops/blob/master/support/25-hosts-as-proxy.PNG]
+
+    **5.5.** Open browser, write domain "dashboard.com" and check k8s dashboard.
+
+    **5.6.** Repeat steps 5.3 to 5.5 for "padel-place.com" using/applying [padel-place-ingress.yaml](/deployments/k8s/padel-place-ingress.yaml)
 
 ***Optional***: Running under WSL needs allowing traffic through the firewall, i.e. 
 using PS <code>New-NetFirewallRule -DisplayName "Allow MongoDB" -Direction Inbound -LocalPort 27017 -Protocol TCP -Action Allow</code>

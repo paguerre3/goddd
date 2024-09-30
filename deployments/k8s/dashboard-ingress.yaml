@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dashboard-ingress
+  namespace: kubernetes-dashboard
+spec:
+  # routing rules forward requests from Host to InternalService
+  rules:
+  - host: dashboard.com
+    # http doesn't define "external protocol" of public URL, e.g. https or http of my-domain,
+    # instead it defines the "internal protocol" used for forwarding requests to InternalService
+    http:
+      # paths also holds anything that is displayed after host domain, e.g. resources path.
+      # servicePort mapps with InternalService port and not targetPort/node nor nodePort/exernalIP (when LoadBalancer type of ExternalService)
+      paths:
+      - path: / 
+        pathType: Prefix
+        backend:
+          service:
+            name: kubernetes-dashboard
+            port:
+              # port of Ingress matches with InternalService port and not targetPort/node nor nodePort/exernalIP (when LoadBalancer type of ExternalService).
+              number: 80
