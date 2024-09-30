@@ -62,6 +62,7 @@ padel-tournament/
 
 0. [Docker install](docs/0_docker-install-in-wsl.txt)
 1. [Kubectl and Minikube install](docs/1_minikube-install.txt)
+2. [Build Docker image and publish it to Dockerhub *(Already done)*](docs/2_build_docker_image_and_publish_it.txt)
 
 
 ***Optional***: Running under WSL needs allowing traffic through the firewall, i.e. 

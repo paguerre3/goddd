@@ -1,0 +1,14 @@
+# build image with 1.0 tag:
+1. docker build -t <your-dockerhub-username>/<your-image-name>:<tag> .
+   docker build -t paguerre3/padelplace:1.0 .
+
+2. docker login or docker login -u <username>
+
+# tag as latest and also supporting previous tag 1.0:
+3. docker tag <local-image-id> <your-dockerhub-username>/<your-image-name>:<tag>
+   docker tag paguerre3/padelplace:1.0 paguerre3/padelplace:latest
+
+# publish to dockerhub the same image with both tags:
+4. docker push <your-dockerhub-username>/<your-image-name>:<tag>
+   docker push paguerre3/padelplace:1.0
+   docker push paguerre3/padelplace:latest
