@@ -66,7 +66,7 @@ padel-tournament/
 3. K8s deployment, i.e. <code>kubectl apply</code> *in order*:
 Namespace 1st, then deployments
 ```bash
-kubectl apply -f ./deployments/goddd-namespace.yaml    
+kubectl apply -f ./deployments/goddd-namespace.yaml
 ```
 Mongodb deployment
 ```bash
@@ -80,7 +80,6 @@ Padel-place deployment and ingress
 ```bash
 kubectl apply -f ./deployments/padel-place-*.yaml
 ```
-
 4. [Mongo Express URI](http://localhost:8081/)
 
 ***Optional***: Running under WSL needs allowing traffic through the firewall, i.e. 
