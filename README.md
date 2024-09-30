@@ -86,7 +86,7 @@ padel-tournament/
     ```bash	
     minikube service mongo-express-service --namespace=goddd
     ```
-    V. [Mongo Express URI (port range from: 30000)](http://127.0.0.1:from30000/)
+    V. [Mongo Express URI (port range from 30000 -it will be assigned by Minikube)](http://127.0.0.1:30000/)
 
     VI. Padel-place deployment & ingress
     ```bash
