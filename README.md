@@ -63,7 +63,25 @@ padel-tournament/
 0. [Docker install](docs/0_docker-install-in-wsl.txt)
 1. [Kubectl and Minikube install](docs/1_minikube-install.txt)
 2. [Build Docker image and publish it to Dockerhub *(Already done)*](docs/2_build_docker_image_and_publish_it.txt)
+3. K8s deployment, i.e. <code>kubectl apply</code> *in order*:
+Namespace 1st, then deployments
+```bash
+kubectl apply -f ./deployments/goddd-namespace.yaml    
+```
+Mongodb deployment
+```bash
+kubectl apply -f ./deployments/mongodb-secret.yaml ./deployments/mongodb-deployment.yaml
+```
+Mongo-express deployment
+```bash
+kubectl apply -f ./deployments/mongo-express-deployment.yaml
+```
+Padel-place deployment and ingress
+```bash
+kubectl apply -f ./deployments/padel-place-*.yaml
+```
 
+4. [Mongo Express URI](http://localhost:8081/)
 
 ***Optional***: Running under WSL needs allowing traffic through the firewall, i.e. 
 using PS <code>New-NetFirewallRule -DisplayName "Allow MongoDB" -Direction Inbound -LocalPort 27017 -Protocol TCP -Action Allow</code>
