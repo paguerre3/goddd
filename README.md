@@ -187,9 +187,6 @@ e.g. using docker driver and tunneling
     ```bash
     kubectl get ingress -n goddd
     ```
-    ```bash
-    kubectl get ingress -n goddd
-    ```
 
 ***Optional***: Running under WSL needs allowing traffic through the firewall, i.e. 
 using PS <code>New-NetFirewallRule -DisplayName "Allow MongoDB" -Direction Inbound -LocalPort 27017 -Protocol TCP -Action Allow</code>
