@@ -74,11 +74,11 @@ kubectl apply -f ./deployments/k8s/mongodb-secret.yaml --namespace=goddd
 ```
 Mongodb deployment
 ```bash
-kubectl apply -f ./deployments/k8s/mongodb-deployment.yaml
+kubectl apply -f ./deployments/k8s/mongodb-deployment.yaml --namespace=goddd
 ```
 Mongo-express deployment
 ```bash
-kubectl apply -f ./deployments/k8s/mongo-express-deployment.yaml
+kubectl apply -f ./deployments/k8s/mongo-express-deployment.yaml --namespace=goddd
 ```
 *⚠️ Only for Minikube*: It shows "pending" EXTERNAL IP because of the usage of Minikube (using k8s directly should display external IP right away). Is needed to additionally execute "manually" <code>minikube service mongo-express-service</code> so Minikube assigns the external IP to the ExternalService of mongoexpress already defined, 
 e.g. using docker driver and tunneling
