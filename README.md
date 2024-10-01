@@ -190,7 +190,7 @@ e.g. using docker driver and tunneling
     kubectl get ingress -n goddd
     ```
     ```bash    
-    kubectl port-forward svc/padel-place-service -n goddd 8001:80
+    kubectl port-forward svc/padel-place-service -n goddd 8001:8080
     ```
     APIs will be available under "padel-place.com" *(or "padel-place.com:8001" in case port forwarding)*.
 
