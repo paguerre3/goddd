@@ -174,15 +174,25 @@ e.g. using docker driver and tunneling
 
     Or editing `/etc/hosts` file with IP address of dashboard-ingress and HOST name of "dashboard.com" under Linux distro OS.
 
-    **5.5.** Open browser, write domain "dashboard.com" and check k8s dashboard.
+    **5.5.** ***⚠️ Only if running on embedded Linux distro: Enable port forwarding using `Kubctl`:***
+    ```bash    
+    kubectl port-forward svc/kubernetes-dashboard -n kubernetes-dashboard 8001:80
+    ```
+    ***In this case edit host file having dashboard pointing to `127.0.0.1:8001` and execute `ipconfig /flushdns`***
 
-    **5.6.** Repeat steps 5.3 to 5.5 for "padel-place.com" using/applying [padel-place-ingress.yaml](/deployments/k8s/padel-place-ingress.yaml)
+    **5.6.** Open browser, write domain "dashboard.com" *(or "dashboard.com:8081" in case port forwarding)* and check k8s dashboard.
+
+    **5.7.** Repeat steps 5.3 to 5.6 for "padel-place.com" using/applying [padel-place-ingress.yaml](/deployments/k8s/padel-place-ingress.yaml)
     ```bash
     kubectl apply -f ./deployments/k8s/padel-place-ingress.yaml --namespace=goddd
     ```
     ```bash
     kubectl get ingress -n goddd
     ```
+    ```bash    
+    kubectl port-forward svc/padel-place-service -n goddd 8001:80
+    ```
+    APIs will be available under "padel-place.com" *(or "padel-place.com:8081" in case port forwarding)*.
 
 ***Optional***: Running under WSL needs allowing traffic through the firewall, i.e. 
 using PS <code>New-NetFirewallRule -DisplayName "Allow MongoDB" -Direction Inbound -LocalPort 27017 -Protocol TCP -Action Allow</code>
