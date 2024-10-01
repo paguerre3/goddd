@@ -172,6 +172,8 @@ e.g. using docker driver and tunneling
     
     ![hosts dns update](https://github.com/paguerre3/kubeops/blob/master/support/25-hosts-as-proxy.PNG)
 
+    Or editing `/etc/hosts` file with IP address of dashboard-ingress and HOST name of "dashboard.com" under Linux distro OS.
+
     **5.5.** Open browser, write domain "dashboard.com" and check k8s dashboard.
 
     **5.6.** Repeat steps 5.3 to 5.5 for "padel-place.com" using/applying [padel-place-ingress.yaml](/deployments/k8s/padel-place-ingress.yaml)
@@ -184,7 +186,7 @@ e.g. using docker driver and tunneling
 
 ***Optional***: Running under WSL needs allowing traffic through the firewall, i.e. 
 using PS <code>New-NetFirewallRule -DisplayName "Allow MongoDB" -Direction Inbound -LocalPort 27017 -Protocol TCP -Action Allow</code>
-and <code>New-NetFirewallRule -DisplayName "Allow MongoExpress" -Direction Inbound -LocalPort 8081 -Protocol TCP -Action Allow</code>.  
+and <code>New-NetFirewallRule -DisplayName "Allow MongoExpress" -Direction Inbound -LocalPort 8081 -Protocol TCP -Action Allow</code>.
 
 
 ---
