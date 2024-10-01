@@ -198,6 +198,12 @@ e.g. using docker driver and tunneling
 using PS <code>New-NetFirewallRule -DisplayName "Allow MongoDB" -Direction Inbound -LocalPort 27017 -Protocol TCP -Action Allow</code>
 and <code>New-NetFirewallRule -DisplayName "Allow MongoExpress" -Direction Inbound -LocalPort 8081 -Protocol TCP -Action Allow</code>.
 
+**Alternative 2: Using Docker, Kubectl, Minikube (K8s) and Helm**
+0. [Docker install](docs/0_docker-install-in-wsl.txt)
+1. [Kubectl and Minikube install](docs/1_minikube-install.txt)
+2. [Build Docker image and publish it to Dockerhub *(Already done)*](docs/2_build_docker_image_and_publish_it.txt)
+3. [Helm install](docs/3_helm-install.txt)
+
 
 ---
 ### DDD reading
