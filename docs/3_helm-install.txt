@@ -1,0 +1,19 @@
+1. sudo snap install helm --classic
+
+2. helm version
+
+3. minikube start
+
+# 4. Set up Helm in Minikube
+# Unlike Helm 2, Helm 3 does not require Tiller (the server-side component). 
+# This simplifies setup in Minikube. 
+# All you need to do is ensure the correct configuration of Helm with Minikube.
+
+# Add Helm Chart Repositories:
+4.1. helm repo add stable https://charts.helm.sh/stable
+4.2. helm repo update
+
+# 5. Install a sample chart:
+5.1. helm install my-nginx stable/nginx-ingress
+
+6. helm list
