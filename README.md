@@ -180,7 +180,7 @@ e.g. using docker driver and tunneling
     ```
     ***In this case edit host file having dashboard pointing to `127.0.0.1:8001` and execute `ipconfig /flushdns`***
 
-    **5.6.** Open browser, write domain "dashboard.com" *(or "dashboard.com:8081" in case port forwarding)* and check k8s dashboard.
+    **5.6.** Open browser, write domain "dashboard.com" *(or "dashboard.com:8001" in case port forwarding)* and check k8s dashboard.
 
     **5.7.** Repeat steps 5.3 to 5.6 for "padel-place.com" using/applying [padel-place-ingress.yaml](/deployments/k8s/padel-place-ingress.yaml)
     ```bash
@@ -192,7 +192,7 @@ e.g. using docker driver and tunneling
     ```bash    
     kubectl port-forward svc/padel-place-service -n goddd 8001:80
     ```
-    APIs will be available under "padel-place.com" *(or "padel-place.com:8081" in case port forwarding)*.
+    APIs will be available under "padel-place.com" *(or "padel-place.com:8001" in case port forwarding)*.
 
 ***Optional***: Running under WSL needs allowing traffic through the firewall, i.e. 
 using PS <code>New-NetFirewallRule -DisplayName "Allow MongoDB" -Direction Inbound -LocalPort 27017 -Protocol TCP -Action Allow</code>
