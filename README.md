@@ -204,10 +204,10 @@ e.g. using docker driver and tunneling
 3. [Helm install](docs/3_helm-install.txt)
 4. Deploy helm charts of DEV or QA environments
     ```bash
-    helm install padel-place ./deployments/helm/padel-place -f values-dev.yaml
+    helm install padel-place ./deployments/helm/padel-place -f ./deployments/helm/padel-place/values-dev.yaml
     ```
     ```bash
-    helm install padel-place ./deployments/helm/padel-place -f values-qa.yaml
+    helm install padel-place ./deployments/helm/padel-place -f ./deployments/helm/padel-place/values-qa.yaml
     ```
 5. Check installation
     ```bash
