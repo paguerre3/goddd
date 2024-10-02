@@ -1,0 +1,6 @@
+namespace: goddd-dev
+
+replicaCount: 1
+
+ingress:
+  host: padel-place-dev.com

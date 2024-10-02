@@ -1,0 +1,6 @@
+namespace: goddd-qa
+
+replicaCount: 2
+
+ingress:
+  host: padel-place-qa.com

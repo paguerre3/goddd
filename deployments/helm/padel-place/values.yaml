@@ -1,0 +1,27 @@
+namespace: goddd-local
+
+image: paguerre3/padelplace:latest
+
+replicaCount: 1
+
+ingress:
+  host: padel-place-local.com
+
+mongodb:
+  uri: mongodb://root:pass@mongodb-service:27017
+  #enable V2 in case mongo express is required:
+  #uriV2: mongodb://root:pass@mongodb-service:27017/
+  username: root
+  password: pass
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi 
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

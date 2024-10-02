@@ -1,0 +1,12 @@
+#v2 uses helm3 and above (no Tiller and more robust security)
+apiVersion: v2
+name: padel-place
+description: A Helm chart for deploying a padel-place GO application
+version: 1.0.0
+appVersion: "1.0.0"
+
+#dependencies:
+#  mongodb is the convention name of the Chart that contains mongo image in bitnami      
+#  - name: mongodb
+#    version: latest
+#    repository: "https://charts.bitnami.com/bitnami"
