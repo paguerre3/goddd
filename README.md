@@ -211,7 +211,13 @@ e.g. using docker driver and tunneling
     ```
 5. Check installation
     ```bash
-    helm list
+    helm list --all
+    ```
+    ```bash
+    helm list --all -n goddd-dev
+    ```
+    ```bash
+    helm list --all -n goddd-qa
     ```
 6. Emulate "entry point" that behaves as a Proxy in front of `IngressController` outside k8s cluster so `IngressController` can use "dashboard" Ingress rule to evaluate and manage redirection (forwarding requests to "dashboard" `InternalService`), i.e. go to "hosts" file of OS and create dns rule that matches with HOST and IP address of dashboard-ingress, e.g.
     
