@@ -202,6 +202,29 @@ e.g. using docker driver and tunneling
 1. [Kubectl and Minikube install](docs/1_minikube-install.txt)
 2. [Build Docker image and publish it to Dockerhub *(Already done)*](docs/2_build_docker_image_and_publish_it.txt)
 3. [Helm install](docs/3_helm-install.txt)
+4. Deploy helm charts of DEV or QA environments
+    ```bash
+    helm install padel-place ./deployments/helm/padel-place -f values-dev.yaml
+    ```
+    ```bash
+    helm install padel-place ./deployments/helm/padel-place -f values-qa.yaml
+    ```
+5. Check installation
+    ```bash
+    helm list
+    ```
+6. Emulate "entry point" that behaves as a Proxy in front of `IngressController` outside k8s cluster so `IngressController` can use "dashboard" Ingress rule to evaluate and manage redirection (forwarding requests to "dashboard" `InternalService`), i.e. go to "hosts" file of OS and create dns rule that matches with HOST and IP address of dashboard-ingress, e.g.
+    
+    Editing `/etc/hosts` file with IP address of padel-place-ingress and HOST name of "padel-place-dev.com" or "padel-place-qa.com" under Linux distro OS.
+
+    **6.1.** ***⚠️ Only if running on embedded Linux distro: Enable port forwarding using `Kubctl`:***
+    ```bash    
+    kubectl port-forward svc/padel-place-service -n goddd-dev 8001:8080
+    ```
+    ```bash    
+    kubectl port-forward svc/padel-place-service -n goddd-qa 8001:8080
+    ```
+    ***In this case edit host file having padel-place-dev.com or padel-place-qa.com pointing to `127.0.0.1:8001` and execute `ipconfig /flushdns`***
 
 
 ---
